@@ -1,0 +1,105 @@
+---
+layout: page
+title:  "Identification"
+stitle: "Identification"
+date:   2005-05-30 18:29:56
+mathjax: true
+---
+
+			<h2 id="environment">Identification through correlation</h2>
+
+			<p>Correlation is about finding all the places in an image where a subimage appears:</p>
+
+			<!-- Latex: f(x,y)\circ w(x,y)\Leftrightarrow F(u,v)H\ast(u,v) -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>f</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><mo>&#8728;</mo><mi>w</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><mo>&#8660;</mo><mi>F</mi><mo>(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo>)</mo><mi>H</mi><mo>*</mo><mo>(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo>)</mo></math></p>
+
+			<p>What this operation is telling us is, that the spatial correlation can be achieved through the multiplication of the Fourier transform of the image by the conjugate transform of the subimage.</p>
+
+			<p>In MATLAB, the process of correlation is done through the following command:</p>
+
+			<pre><code class="language-matlab">g = dftcorr(f,w)</code></pre>
+
+			<p>where <code class="language-matlab">g</code> is the resulting image from the process, <code class="language-matlab">f</code> is the original image, and <code class="language-matlab">w</code> is the subimage.</p>
+
+			<p>You can practice these concepts using <code class="language-matlab">snippet09</code>.</p>
+				<div class="menu">
+				    <input type="checkbox" id="show">
+					<label for="show" class="arrow doc">{% include doc.svg %} View snippet 09</label>
+					<div class="arrow selected">
+						Download: &nbsp;
+						<a href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include github.svg %}</a> 
+						<a href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}/">{% include bitbucket.svg %}</a> 
+						<a href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include gitlab.svg %}</a> 
+					</div>
+
+					<pre class="contents"><code class="language-matlab">	
+% Load image
+f = imread('hurricane.jpg');
+w = imread('hurricane-mask.jpg');
+figure, imshow(f);
+figure, imshow(w);
+
+% Correlation
+g  = dftcorr(f,w);  
+gs = gscale(g);
+figure, imshow(gs);
+figure, imshow(gs > 254);
+
+% Load image
+f = imread('bottle1.jpg');
+g = imread('bottle2.jpg');
+figure, imshow(f),
+figure, imshow(g);
+
+% Borders by polygons
+[x1, y1] = minperpoly(f, 8);
+[M,N] = size(f);
+h1 = connectpoly(x1, y1);
+H1 = bound2im(h1, M, N);
+figure, imshow(H1);
+
+[x2, y2] = minperpoly(g, 8);
+[M,N] = size(g);
+h2 = connectpoly(x2, y2);
+H2 = bound2im(h2, M, N);
+figure, imshow(H2);
+
+% Noise
+[x1r, y1r] = randvertex(x1, y1, 8);
+[x2r, y2r] = randvertex(x2, y2, 8);
+
+i1 = connectpoly(x1r, y1r);
+I1 = bound2im(i1, M, N);
+figure, imshow(I1);
+
+i2 = connectpoly(x2r, y2r);
+I2 = bound2im(i2, M, N);
+figure, imshow(I2);
+
+% Create chain
+angles1 = polyangles(x1,y1);
+s1 = floor(angles1/45)+1;
+s1 = int2str(s1)
+
+angles2 = polyangles(x2,y2);
+s2 = floor(angles2/45)+1;
+s2 = int2str(s2)
+
+angles1r = polyangles(x1r,y1r);
+s1r = floor(angles1r/45)+1;
+s1r = int2str(s1r)
+
+angles2r = polyangles(x2r,y2r);
+s2r = floor(angles2r/45)+1;
+s2r = int2str(s2r)
+
+% Similarity of chains
+a = strsimilarity(s1, s2);
+b = strsimilarity(s1, s1r);
+c = strsimilarity(s1, s2r);
+
+d = strsimilarity(s2, s1r);
+e = strsimilarity(s2, s2r);
+
+h = strsimilarity(s1r, s2r);</code></pre>
+				</div>

@@ -1,0 +1,138 @@
+body {
+	font-family: $base-font-family;
+	font-size:   $base-font-size;
+	line-height: $base-line-height;
+	font-weight: 300;
+	color:       $text-color;
+	background-color: $background-color;
+	background-image: 
+		linear-gradient(rgba(245,245,245,1)         2px, transparent 2px),
+		linear-gradient(90deg, rgba(245,245,2450,1) 2px, transparent 2px);
+	background-size:     20px 20px, 20px 20px;
+	background-position: -1px -1px, -1px -1px;
+}
+
+::-moz-selection {
+	xbackground: lighten($brand-color, 50%);
+	background: $brand-color;
+	color: $background-color;
+	text-shadow: none;
+}
+
+::selection {
+	xbackground: lighten($brand-color, 50%);
+	background: $brand-color;
+	color: $background-color;
+	text-shadow: none;
+}
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+    vertical-align: middle;
+}
+
+h2, h3, h4, h5, h6,
+p, blockquote, pre,
+ul, ol, dl, figure,
+%vertical-rhythm {
+	margin-bottom: $spacing-unit / 2;
+}
+
+
+dt {
+	font-weight: bold;
+}
+
+img {
+	max-width: 100%;
+	height:    auto;
+	vertical-align: middle;
+}
+
+figure > img {
+	display: block;
+}
+
+figcaption {
+	font-size: $small-font-size;
+}
+
+ul, ol {
+	margin-left: $spacing-unit;
+}
+
+li {
+	> ul,
+	> ol {
+		 margin-bottom: 0;
+	}
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+}
+
+h1 {
+	margin: 2em auto;
+	padding-top: .5em;
+	text-align: center;
+	font-size: 1.5em;
+	font-weight: 400;
+}
+
+a {
+	color: $brand-color;
+	text-decoration: none;
+
+	&:visited {
+		color: darken($brand-color, 15%);
+	}
+
+	&:hover {
+		color: $text-color;
+		text-decoration: underline;
+	}
+}
+
+blockquote {
+	color: $grey-color;
+	border-left: 4px solid $grey-color-light;
+	padding-left: $spacing-unit / 2;
+	font-size: 18px;
+	letter-spacing: -1px;
+	font-style: italic;
+
+	> :last-child {
+		margin-bottom: 0;
+	}
+}
+
+.wrapper {
+	max-width: 40em;
+	margin: auto;
+	padding: 0;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+
+
+.browserupgrade {
+    margin:  0.2em 0;
+    padding: 0.2em 0;
+    background: #ccc;
+    color:      #000;
+}
+

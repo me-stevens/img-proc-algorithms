@@ -1,0 +1,120 @@
+---
+layout: page
+title:  "Filtering in the domain of frequency"
+stitle: "Filtering"
+date:   2005-04-17 14:34:28
+---
+
+			<p>To make a Fourier-discrete transform to an MxN matrix, MATLAB uses the algorithm <em>Fast Fourier Transform</em>:</p>
+
+			<pre><code class="language-matlab">F = fft2(f)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the image, and <code class="language-matlab">F</code> is the transformed image. The image has to be in <strong>double</strong> format. You can show the Fourier spectrum with:</p>
+
+			<pre><code class="language-matlab">
+S = abs(F);
+imshow(S, []);</code></pre>
+
+			<p>To show the Fourier transform in more detail, it is better to apply it a logarithmic transform:</p>
+
+			<pre><code class="language-matlab">figure, imshow(log(1+abs(F)),[])</code></pre>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/fourier.png" width="1205" height="549" alt="Fourier transform of an image after a logartimic transform"></p>
+
+			<p>We need to make a translation to place the centre of the transform in the position (M/2,N/2).</p>
+
+			<pre><code class="language-matlab">Fc = fftshift(F)</code></pre>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/fourierShifted.png" width="1201" height="493" alt="Fourier transform of an image with its center shifted"></p>
+
+			<p>Just be aware that this:</p>
+
+			<pre><code class="language-matlab">fftshift(fft2(f))</code></pre>
+
+			<p>is not the same as this:</p>
+
+			<pre><code class="language-matlab">fft2(fftshift(f))</code></pre>
+
+			<p>To get the inverse transform:</p>
+
+			<pre><code class="language-matlab">f = ifft2(F)</code></pre>
+
+			<p>In theory, this should give us a real image, but due to issues rounding doubles, it has a small imaginary part. So it's better to use:</p>
+
+			<pre><code class="language-matlab">f = real(ifft2(F))</code></pre>
+
+			<p>If we had already translated the transform, we can invert the process with:</p>
+
+			<pre><code class="language-matlab">F = ifftshift(Fc)</code></pre>
+
+			<p>To make a filtering in the domain of frequency, we use the convolution theorem:</p>
+
+			<pre><code class="language-matlab">f(x,y)*g(x,y) &DoubleLeftRightArrow; F(u,v)G(u,v)
+f(x,y)g(x,y) &DoubleLeftRightArrow; F(u,v)*G(u,v)</code></pre>
+
+			<p>This equation shows that we can apply filters in the domain of frequency. But we have again a small problem with borders when we have to apply filters. The discrete-Fourier transform returns a periodic function where each period is the transformed image. This can make strange phenomenons appear when we have to filter the image.</p>
+
+			<p>When applying the Fourier transform, we turn the image into a periodic one, and then, do the Fourier transform over that periodic function.</p>
+
+			<p>We would have to extend the image borders to avoid problems when doing the transformations. How much? If we suppose that the image <code class="language-matlab">f(x,y)</code> has a size of AxB, and the mask to apply <code class="language-matlab">h(x,y)</code> has a size of CxD, then:</p>
+
+			<pre><code class="language-matlab">
+P ≥ A + C - 1
+Q ≥ B + D - 1</code></pre>
+
+			<p>To add those borders to our image before we apply a filter, we use the following command, which applies a Fourier transform to our image:</p>
+
+			<pre><code class="language-matlab">F = fft2(f, P, Q)</code></pre>
+
+			<p>Normally, we will work with filters of the same size as the image (MxN), so we use as sizes:</p>
+
+			<pre><code class="language-matlab">
+P ≥ 2M - 1
+Q ≥ 2N - 1</code></pre>
+
+			<p>Steps to follow in order to filter an image:</p>
+
+			<ol>
+				<li>Obtain the right size to extend an image:
+					<pre><code class="language-matlab">
+[M N] = size(f);
+P = 2 * M;
+Q = 2 * N;</code></pre></li>
+
+				<li>Obtain the Fourier transform, with extended borders:
+					<pre><code class="language-matlab">F = fft2(f, P, Q)</code></pre>
+				</li>
+
+				<li>Generate a filter function H, with a size of PxQ. The filter should be in the format shown in points 4, 5 and 6. If it is centred, use <code class="language-matlab">fftshift(H)</code> to de-centre it.</li>
+
+				<li>Multiply the transform by the filter:
+					<pre><code class="language-matlab">G = H.*F</code></pre>
+				</li>
+
+				<li>Obtain the real part of the inverse transform:
+					<pre><code class="language-matlab">g = real(ifft2(G))</code></pre>
+				</li>
+
+				<li>Reduce the image size to its original size:
+					<pre><code class="language-matlab">g = g(1:m,1:n)</code></pre>
+				</li>
+			</ol>
+
+
+			<p>We can create frequency filters from spatial filters:</p>
+
+			<pre><code class="language-matlab">H = freqz2(h, R, C)</code></pre>
+
+			<p>where <code class="language-matlab">h</code> is a spatial filter, <code class="language-matlab">R</code> is the size in rows we want it to have, <code class="language-matlab">C</code> is the size in columns, and <code class="language-matlab">H</code> is the filter that works in the domain of frequency. For example, a Sobel filter:</p>
+
+			<pre><code class="language-matlab">h = fspecial('sobel')';
+H = freqz2(h, 500, 500);</code></pre>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/freqz1.png" width="527" height="348" alt="Sobel transform"></p>
+
+			<pre><code class="language-matlab">ifftshift(H)</code></pre>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/freqz2.png" width="549" height="395" alt="Sobel transform shifted"></p>
+
+	
+

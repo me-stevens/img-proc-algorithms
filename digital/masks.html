@@ -1,0 +1,354 @@
+---
+layout: page
+title:  "Local processing through masks"
+stitle: "Masks"
+date:   2005-04-09 21:19:22
+---
+
+
+<!--			<p>Imagine we have an image like this:</p>-->
+
+<!--			<p class="center"><code>0 0 0 0 0 -->
+<!--0 0 0 0 0-->
+<!--0 0 1 0 0-->
+<!--0 0 0 0 0-->
+<!--0 0 0 0 0</code></p>-->
+
+<!--			<p>And this mask:</p>-->
+
+<!--			<p class="center"><code>1 2 3-->
+<!--4 5 6-->
+<!--7 8 9</code></p>-->
+
+			<p>To apply a local processing through a mask:</p>
+
+			<pre><code class="language-matlab">g = imfilter(f, w, filter_mode, border_options, size_options)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the original image, <code class="language-matlab">w</code> is the mask, <code class="language-matlab">g</code> is the resulting image, <code class="language-matlab">filter_mode</code> is "corr" for correlation and "conv" for the case of convolution, <code class="language-matlab">size_options</code> which has two size options "full" and "same", and <code class="language-matlab">border_options</code> has several options:</p>
+			<ul class="list">
+				<li><code class="language-matlab">P</code>: The image's borders extend with pixels of value P. By default, P is zero.</li>
+				<li><code class="language-matlab">'replicate'</code>: The image's borders extend with pixels that replicate the value of the pixels that are borders.</li>
+				<li><code class="language-matlab">'symmetric'</code>: The image's borders are extended making a mirror effect with the image.</li>
+				<li><code class="language-matlab">'circular'</code>: The image is extended interpreting the image as the period of a periodic 2D function.</li>
+			</ul>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/masks.png" width="1207" height="500" alt="Appplication of a mask"></p>
+
+
+			<h2 id="filters">Filter creation</h2>
+
+			<p>You can crate "standard" filters using MATLAB's Toolbox:</p>
+
+			<pre><code class="language-matlab">w = fspecial('type', parameters)</code></pre>
+
+			<p>where <code class="language-matlab">type</code> specifies the type of filter, and <code class="language-matlab">parameters</code> specifies the details of said filter.</p>
+
+			<p>Options for <code class="language-matlab">type</code>:</p>
+
+			<ul class="list">
+				<li><code class="language-matlab">'average'</code>: It's defined like this: 
+					<pre><code class="language-matlab">fspecial('average', [r c])</code></pre>
+					where <code class="language-matlab">[r c]</code> is the filter size. By default it's 3x3. If instead of <code class="language-matlab">[r c]</code> we use a number, we'll have a squared matrix.</li>
+
+				<li><code class="language-matlab">'disk'</code>: Gives a bigger weight to the central pixel: 
+					<pre><code class="language-matlab">fspecial('disk', [r c])</code></pre>
+					same as before for <code class="language-matlab">[r c]</code> applies here.</li>
+
+				<li><code class="language-matlab">'gaussian'</code>: Low-pass Gaussian filter: 
+					<pre><code class="language-matlab">fspecial('gaussian', [r c], sig)</code></pre>
+					same as before for <code class="language-matlab">[r c]</code> applies here, and <code class="language-matlab">sig</code> represents the (positive) standard deviation.</li>
+
+				<li><code class="language-matlab">'laplacian'</code>:  
+					<pre><code class="language-matlab">fspecial('laplacian', alpha)</code></pre>
+					filter of size 3x3, whose shape is specified by <code class="language-matlab">alpha</code>, a number in between 0 to 1. The default value is 0.5.</li>
+
+				<li><code class="language-matlab">'log'</code>: Laplacian filter of a Gaussian:
+					<pre><code class="language-matlab">fspecial('log', [r c], sig)</code></pre></li>
+
+				<li><code class="language-matlab">'motion'</code>:
+					<pre><code class="language-matlab">fspecial('motion', len, theta)</code></pre>
+					when this filter is applied to an image, it creates a feeling of movement (of the camera with respect to the image) of <code class="language-matlab">len</code> pixels. The direction of the translation is given by <code class="language-matlab">theta</code>.</li>
+
+				<li><code class="language-matlab">'prewitt'</code>:
+					<pre><code class="language-matlab">fspecial('prewitt')</code></pre>
+					By default, it creates vertical gradients. For horizontal gradients, the matrix must be inverted (<code class="language-matlab">wh = wv</code>).</li>
+
+				<li><code class="language-matlab">'unsharp'</code>:
+					<pre><code class="language-matlab">fspecial('unsharp', alpha)</code></pre>
+					Creates a 3x3 unsharp filter, where <code class="language-matlab">alpha</code> controls the shape, and it must be greater than 0 and lower or equal to 1. The default value is 0.2.</li>
+			</ul>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/laplacian-filter.png" width="1116" height="660" alt="Laplacian filter applied to the image of the moon"></p>
+			<p class="center">Laplacian filter</p>
+
+			<h2 id="non-linear">Non-linear filter (median filter)</h2>
+
+			<pre><code class="language-matlab">g = medfilt2(f, [m n], border_options)</code></pre>
+
+			<p>where <code class="language-matlab">g</code> is the resulting filtered image, <code class="language-matlab">f</code> is the image to filter, <code class="language-matlab">[m n]</code> is the size of the mask ([3 3] by default), and there are two border options: <code class="language-matlab">'zeros'</code>, which is the default and <code class="language-matlab">'symmetric'</code>.</p>
+
+				<p>You can practice these concepts using <code class="language-matlab">snippet03</code>.</p>
+				<div class="menu">
+				    <input type="checkbox" id="show">
+					<label for="show" class="arrow doc">{% include doc.svg %} View snippet 03</label>
+					<div class="arrow selected">
+						Download: &nbsp;
+						<a href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include github.svg %}</a> 
+						<a href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}/">{% include bitbucket.svg %}</a> 
+						<a href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include gitlab.svg %}</a> 
+					</div>
+
+					<pre class="contents"><code class="language-matlab">
+% Load image
+f = imread('squares.jpg');
+imshow(f);
+
+% Average filter
+avgF = fspecial('average', 31);
+g1   = imfilter(f, Fmedia, 'corr', 'replicate', 'same');
+g2   = imfilter(f, Fmedia, 'corr', 'symmetric', 'same');
+g3   = imfilter(f, Fmedia, 'corr', 'circular',  'same');
+imshow(g1);
+figure, imshow(g2);
+figure, imshow(g3);
+
+% Load image
+h = imread('moon.jpg');
+imshow(h);
+
+%Laplacian filter
+lapF = fspecial('laplacian', 0);
+lapF =
+
+     0     1     0
+     1    -4     1
+     0     1     0
+plot(lapF);
+imshow (lapF);
+ 
+h1 = imfilter(h, lapF, 'corr', 'replicate', 'same');
+h2 = imfilter(h, lapF, 'corr', 'symmetric', 'same');
+h3 = imfilter(h, lapF, 'corr', 'circular',  'same');
+imshow(h1);
+figure, imshow(h2);
+figure, imshow(h3);
+figure, imshow(h1,[]);
+figure, imshow(h2,[]);
+figure, imshow(h3,[]);
+
+% Conversion to double
+h = im2double(h);
+imshow(h);
+
+h1d = imfilter(h, lapF, 'corr', 'replicate', 'same');
+h2d = imfilter(h, lapF, 'corr', 'symmetric', 'same');
+h3d = imfilter(h, lapF, 'corr', 'circular',  'same');
+imshow(h1d,[]);
+figure, imshow(h2d,[]);
+figure, imshow(h3d,[]);
+
+% Substracting matrices
+hh1d = h - h1d;
+hh2d = h - h2d;
+hh3d = h - h3d;
+imshow(hh1d,[]);
+figure, imshow(hh2d,[]);
+figure, imshow(hh3d,[]);
+figure, imshow(h,[]);
+
+
+% Load image
+i = imread ('circuit.jpg');
+imshow(i);
+
+% Salt & Pepper
+in = imnoise(i, 'salt & pepper', 0.2);
+imshow(in);
+
+% Fixing image
+medianF = fspecial('average');
+medianF =
+
+    0.1111    0.1111    0.1111
+    0.1111    0.1111    0.1111
+    0.1111    0.1111    0.1111
+
+in1 = imfilter(in, medianF, 'corr', 'replicate', 'same');
+in2 = imfilter(in, medianF, 'corr', 'symmetric', 'same');
+in3 = imfilter(in, medianF, 'corr', 'circular',  'same');
+imshow(in1, []); 
+figure, imshow(in2, []); 
+figure, imshow(in3, []);
+figure, imshow(in,[]);
+
+% Median filter
+zeros1 = medfilt2(in);
+imshow(zeros1);
+figure, imshow(in);
+figure, imshow('circuit.jpg');
+
+% Symmetric
+zeros2 = medfilt2(in, 'symmetric');
+imshow(in);
+figure, imshow(zeros1);
+figure, imshow(zeros2);
+figure, imshow('circuit.jpg');
+
+% Loading image
+j = imread('audi.jpg');
+imshow(j);
+
+% Border detection
+h1 = [ 1  1 1;  0 0 0; -1 -1 -1]
+h2 = [-1  0 1; -1 0 1; -1  0  1]
+h3 = [ 0  1 1; -1 0 1; -1 -1  0]
+h4 = [-1 -1 0; -1 0 1;  0  1  1]
+
+h1 =
+
+     1     1     1
+     0     0     0
+    -1    -1    -1
+
+h2 =
+
+    -1     0     1
+    -1     0     1
+    -1     0     1
+
+h3 =
+
+     0     1     1
+    -1     0     1
+    -1    -1     0
+
+h4 =
+
+    -1    -1     0
+    -1     0     1
+     0     1     1
+    
+a1  = imfilter(j, h1, 'corr', 'same');
+a2  = imfilter(j, h2, 'corr', 'same');
+a3  = imfilter(j, h3, 'corr', 'same');
+a4  = imfilter(j, h4, 'corr', 'same');
+ans = max(a1, a2);
+ens = max(a3, a4);
+prewitt = max(ans, ens);
+imshow(prewitt)
+
+% Sobel
+h1 = [ 1  2 1;  0 0 0; -1 -2 -1]
+h2 = [-1  0 1; -2 0 2; -1  0  1]
+h3 = [ 0  1 2; -1 0 1; -2 -1  0]
+h4 = [-2 -1 0; -1 0 1;  0  1  2]
+
+h1 =
+
+     1     2     1
+     0     0     0
+    -1    -2    -1
+
+
+h2 =
+
+    -1     0     1
+    -2     0     2
+    -1     0     1
+
+
+h3 =
+
+     0     1     2
+    -1     0     1
+    -2    -1     0
+
+
+h4 =
+
+    -2    -1     0
+    -1     0     1
+     0     1     2
+
+b1 = imfilter(j, h1, 'corr', 'same');
+b2 = imfilter(j, h2, 'corr', 'same');
+b3 = imfilter(j, h3, 'corr', 'same');
+b4 = imfilter(j, h4, 'corr', 'same');
+ans = max(b1, b2);
+ens = max(b3, b4);
+sobel = max(ans, ens);
+imshow(sobel);
+figure, imshow(prewitt);
+
+% Robinson
+h1  = [ 1  1 1;  1 -2 1; -1 -1 -1]
+h2  = [-1  1 1; -1 -2 1; -1  1  1]
+h3  = [ 1  1 1; -1 -2 1; -1 -1  1]
+h4  = [-1 -1 1; -1 -2 1;  1  1  1]
+
+c1  = imfilter(j, h1, 'corr', 'same');
+c2  = imfilter(j, h2, 'corr', 'same');
+c3  = imfilter(j, h3, 'corr', 'same');
+c4  = imfilter(j, h4, 'corr', 'same');
+ans = max(c1, c2);
+ens = max(c3, c4);
+robinson = max(ans, ens);
+imshow(robinson);
+figure, imshow(sobel);
+figure, imshow(prewitt);
+
+h1 =
+
+     1     1     1
+     1    -2     1
+    -1    -1    -1
+
+h2 =
+
+    -1     1     1
+    -1    -2     1
+    -1     1     1
+
+h3 =
+
+     1     1     1
+    -1    -2     1
+    -1    -1     1
+
+h4 =
+
+    -1    -1     1
+    -1    -2     1
+     1     1     1
+
+% kirsch
+h1  = [ 3  3 3;  3 0 3; -5 -5 -5];
+h2  = [-5  3 3; -5 0 3; -5  3  3];
+h3  = [ 3  3 3; -5 0 3; -5 -5  3];
+h4  = [-5 -5 3; -5 0 3;  3  3  3];
+
+d1  = imfilter(j, h1, 'corr', 'same');
+d2  = imfilter(j, h2, 'corr', 'same');
+d3  = imfilter(j, h3, 'corr', 'same');
+d4  = imfilter(j, h4, 'corr', 'same');
+ans = max(d1, d2);
+ens = max(d3, d4);
+kirsch = max(ans, ens);
+imshow(kirsch); figure, imshow(robinson);
+figure, imshow(sobel);
+figure, imshow(prewitt);
+					</code></pre>
+				</div>
+
+			<nav id="toc">
+
+				<h2>Table of contents</h2>
+
+				<ul class="list">
+					<li><a href="#filters">Filter creation</a></li>
+					<li><a href="#non-linear">Non-linear filter (median filter)</a></li>
+				</ul>
+
+			</nav>
+	
+

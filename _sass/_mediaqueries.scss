@@ -1,0 +1,254 @@
+pre[class*="language-"],
+:not(pre) > code[class*="language-"] {
+	border-radius: 0;
+	border: 0;
+}
+
+pre[class*="language-"],
+:not(pre) > code[class*="language-"] {
+	font-size: 0.8em;
+}
+
+.token.attr-name,
+.token.attr-value,
+.token.string,
+.token.char,
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable,
+.token.inserted {
+	color: $brand-color;
+}
+
+@media only screen and (min-width: 22em) {
+
+	.wrapper {
+		padding: 0 $spacing-unit/2;
+	}
+}
+
+@media only screen and (min-width: 35em) {
+
+	.wrapper {
+		padding: 0 $spacing-unit;
+	}
+
+	.site-nav {
+		text-align: center;
+	}
+
+   	.menu-icon {
+		display: none;
+    }
+
+	.trigger {
+		height: 100%;
+		opacity: 1;
+		overflow: visible;
+		padding: 0;
+
+		li {
+			display: inline-block;
+			position: relative;
+		}
+	}
+
+	.dime-item {
+		width:  5em;
+		margin: 1em;
+		transform: rotate(-45deg);
+		cursor: pointer;
+	}
+
+	.dime-text {
+		transform: rotate(45deg);
+	}
+
+	.submenu {
+		position: absolute; /* to avoid the submenu from displacing the dimes */
+/*		top: 3em;*/
+		left: 50%; /* to center the submenu in the dime. Relative to parent */
+		/*transform: translate(-50%, 0); /* add this and remove stuff in li when you don't need to support IE8. Relative to itself */
+		z-index: 1;
+		height: 0;
+		visibility: hidden;
+		opacity: 0;
+
+		li {
+			display: block;
+			position: relative; /* to center the submenu in the dime */
+			left: -50%;
+		}
+
+		&:before {
+			content: '';
+			position: absolute;
+			bottom: 100%;
+			left: 0;
+			margin-left: -1em;
+			width: 0; height: 0;
+			border: 1em solid transparent;
+			border-bottom-color: white;			
+		}
+	}
+
+	.dime-item:hover ~ .submenu,
+	.submenu:hover {
+		height: 100%;
+		visibility: visible;
+		opacity: 1;
+	}
+
+	.footer-col {
+	    display: inline-block;
+		vertical-align: top;
+		width: 30%;
+	}
+
+	$toc-index: 2;
+
+	.site-footer {
+		position: relative;
+		z-index: $toc-index + 1;
+	}
+
+	#toc {
+		position: fixed;
+		bottom: 50%;
+		right:   0%;
+		max-width:  5em;
+		max-height: 1.75em;
+		overflow: hidden;
+		margin:  0;
+		padding: 1em;
+		background-color: #fff;
+		opacity: .3;
+		z-index: $toc-index;
+		cursor: pointer;
+		transition: max-height .4s .2s, max-width .4s .2s, opacity .4s .3s;
+
+		ul {
+			margin:  0;
+			padding: 0;
+		}
+
+		h2 {
+			margin: -.5em 0 .5em;
+			font-size: 1em;
+			font-weight: normal;
+			text-transform: uppercase;
+			text-align: center;
+		}
+
+		&:hover {
+			max-width:  12em;
+			max-height: 17em;
+			overflow: visible;
+			opacity: 1;
+		}
+
+		li {
+			opacity: 0;
+			transition: opacity .4s .3s;
+		}
+
+		&:hover li {
+			opacity: 1;
+		}
+
+	}
+
+	.oneOf4 {
+		display: inline-block;
+		width: 20%;
+		margin-right: 3%;
+	}
+
+}
+
+@media print,
+       (-o-min-device-pixel-ratio: 5/4),
+       (-webkit-min-device-pixel-ratio: 1.25),
+       (min-resolution: 120dpi) {
+    /* Style adjustments for high resolution devices */
+}
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid the additional HTTP request:
+   http://www.phpied.com/delay-loading-your-print-css/
+   ========================================================================== */
+
+@media print {
+    *,
+    *:before,
+    *:after {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster:
+                                   http://www.sanbeiji.com/archives/953 */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links that are fragment identifiers,
+     * or use the `javascript:` pseudo protocol
+     */
+
+    a[href^="#"]:after,
+    a[href^="javascript:"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    /*
+     * Printing Tables:
+     * http://css-discuss.incutio.com/wiki/Printing_Tables
+     */
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}

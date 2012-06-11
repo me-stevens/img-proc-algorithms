@@ -1,0 +1,136 @@
+---
+layout: page
+title:  "Color"
+stitle: "Color"
+date:   2005-06-01 18:29:40
+---
+
+			<h2 id="color">Representation of color in MATLAB</h2>
+
+			<p>It is represented through a MxNx3 matrix, where M is the width of the image, N is the height and there are three matrices, one for each color component in the space in which it is represented. Usually, this color space is RGB (Red, Green, Blue).</p>
+
+			<p>For each pixel of the image, instead of having a numeric value representing the level of grey, we have a vector that represents the color. Each component of the vector represents the intensity of the color in the corresponding channel.</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/rgb.png" width="494" height="425" alt="RGB, Red, Green and Blue colors"></p>
+
+			<p>In MATLAB, you can not only use RGB, but many other color spaces like CMY, CMYK, HSV, HSI, NTSC Color Space, etc. Here we'll work exclusively with RGB and CMY.</p>
+
+
+
+			<h2 id="colorMaps">Color maps</h2>
+
+			<p>Another way of representing an image in MATLAB is through a color map, where we have an image represented by a matrix X (MxN) and a matrix C of dimensions Kx3, that represents the color space, where K is the number of colors in that space.</p>
+
+			<p>Each component of matrix X is an integer between 1 and K. To know the color of that pixel, we just select the corresponding row in C, the three values of that row will represent the color of the corresponding pixel.</p>
+
+
+
+			<h2 id="conversion">Representation conversion</h2>
+
+			<p>To change the representation of an image from RGB to Colormap, we can use the following command:</p>
+
+			<pre><code class="language-matlab">[X, map] = rgb2ind(f, num_of_colors, option)</code></pre>
+
+			<p>where <code class="language-matlab">f</code></pre> is the original image in the format MxNx3 and RGB color space, <code class="language-matlab">num_of_colors</code></pre> is the maximum number of colors that the map is going to have, <code class="language-matlab">option</code></pre> can be <code class="language-matlab">'dither'</code></pre> and <code class="language-matlab">'nodither'</code></pre>. The first value will choose the colors for which we are going to reduce the RGB color space in an intelligent way, as a function of the colors that exist in the image. The second value will scale the values in a proportional way. As a resutl it returns <code class="language-matlab">X</code></pre> and <code class="language-matlab">map</code></pre>. The first one is the image with the indexes and the second is the color map.</p>
+
+			<p>To represent the result, we use the following command:</p>
+
+			<pre><code class="language-matlab">figure, imshow(X, map)</code></pre>
+
+
+			<h2 id="intensity">Intensity transformations</h2>
+
+			<p>To perform an intensity transformation in all the color components or in independent components (red, blue, green, cyan, magenta...) we'll use the following MATLAB command:</p>
+
+			<pre><code class="language-matlab">g = ice('image', f)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the original image and <code class="language-matlab">g</code> is the resulting image after a transformation of its intensity values.</p>
+
+			<p>The command shows the following window through the UI:</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/colorEditor.png" width="739" height="645" alt="Color edition window"></p>
+
+
+			<h2 id="filtering">Color filtering</h2>
+
+			<p>The filtering of color images is done in the same way than with images in gray scale, with <code class="language-matlab">imfilter()</code>, but instead of passing it a gray scale image, we pass it a color image.</p>
+
+			<p>Each of the color images are filtered separately and then they are joined back again in a single image with three color components.</p>
+
+
+			<h2 id="coloredBorders">Colored borders detection</h2>
+
+			<p>The border detection is not transformable any more as the filtering, we can not detect the borders in each color component and then join the images because it wouldn't work.</p>
+
+
+			<p>We are now faced with the following problem (where <em>r</em>, <em>g</em> and <em>u</em> are unit vectors):</p>
+
+			<!-- Latex: \overrightarrow u=\frac{\partial R}{\partial x}\overrightarrow r+\frac{\partial G}{\partial x}\overrightarrow g+\frac{\partial B}{\partial x}\overrightarrow b -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><mover><mi>u</mi><mo>&#8594;</mo></mover><mo>=</mo><mfrac><mrow><mo>&#8706;</mo><mi>R</mi></mrow><mrow><mo>&#8706;</mo><mi>x</mi></mrow></mfrac><mover><mi>r</mi><mo>&#8594;</mo></mover><mo>+</mo><mfrac><mrow><mo>&#8706;</mo><mi>G</mi></mrow><mrow><mo>&#8706;</mo><mi>x</mi></mrow></mfrac><mover><mi>g</mi><mo>&#8594;</mo></mover><mo>+</mo><mfrac><mrow><mo>&#8706;</mo><mi>B</mi></mrow><mrow><mo>&#8706;</mo><mi>x</mi></mrow></mfrac><mover><mi>b</mi><mo>&#8594;</mo></mover></math></p>
+
+			<!-- Latex: \overrightarrow v=\frac{\partial R}{\partial y}\overrightarrow r+\frac{\partial G}{\partial y}\overrightarrow g+\frac{\partial B}{\partial y}\overrightarrow b -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><mover><mi>v</mi><mo>&#8594;</mo></mover><mo>=</mo><mfrac><mrow><mo>&#8706;</mo><mi>R</mi></mrow><mrow><mo>&#8706;</mo><mi>y</mi></mrow></mfrac><mover><mi>r</mi><mo>&#8594;</mo></mover><mo>+</mo><mfrac><mrow><mo>&#8706;</mo><mi>G</mi></mrow><mrow><mo>&#8706;</mo><mi>y</mi></mrow></mfrac><mover><mi>g</mi><mo>&#8594;</mo></mover><mo>+</mo><mfrac><mrow><mo>&#8706;</mo><mi>B</mi></mrow><mrow><mo>&#8706;</mo><mi>y</mi></mrow></mfrac><mover><mi>b</mi><mo>&#8594;</mo></mover></math></p>
+
+			<!-- Latex: g_{xx}=\overrightarrow u\cdot\overrightarrow u=\overrightarrow u^T\cdot\overrightarrow u=\left|\frac{\partial R}{\partial x}\right|^2+\left|\frac{\partial G}{\partial x}\right|^2+\left|\frac{\partial B}{\partial x}\right|^2 -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>g</mi><mrow><mi>x</mi><mi>x</mi></mrow></msub><mo>=</mo><mover><mi>u</mi><mo>&#8594;</mo></mover><mo>&#183;</mo><mover><mi>u</mi><mo>&#8594;</mo></mover><mo>=</mo><msup><mover><mi>u</mi><mo>&#8594;</mo></mover><mi>T</mi></msup><mo>&#183;</mo><mover><mi>u</mi><mo>&#8594;</mo></mover><mo>=</mo><msup><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>R</mi></mrow><mrow><mo>&#8706;</mo><mi>x</mi></mrow></mfrac></mfenced><mn>2</mn></msup><mo>+</mo><msup><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>G</mi></mrow><mrow><mo>&#8706;</mo><mi>x</mi></mrow></mfrac></mfenced><mn>2</mn></msup><mo>+</mo><msup><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>B</mi></mrow><mrow><mo>&#8706;</mo><mi>x</mi></mrow></mfrac></mfenced><mn>2</mn></msup></math></p>
+
+			<!-- Latex: g_{yy}=\overrightarrow v\cdot\overrightarrow v=\overrightarrow v^T\cdot\overrightarrow v=\left|\frac{\partial R}{\partial y}\right|^2+\left|\frac{\partial G}{\partial y}\right|^2+\left|\frac{\partial B}{\partial y}\right|^2 -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>g</mi><mrow><mi>y</mi><mi>y</mi></mrow></msub><mo>=</mo><mover><mi>v</mi><mo>&#8594;</mo></mover><mo>&#183;</mo><mover><mi>v</mi><mo>&#8594;</mo></mover><mo>=</mo><msup><mover><mi>v</mi><mo>&#8594;</mo></mover><mi>T</mi></msup><mo>&#183;</mo><mover><mi>v</mi><mo>&#8594;</mo></mover><mo>=</mo><msup><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>R</mi></mrow><mrow><mo>&#8706;</mo><mi>y</mi></mrow></mfrac></mfenced><mn>2</mn></msup><mo>+</mo><msup><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>G</mi></mrow><mrow><mo>&#8706;</mo><mi>y</mi></mrow></mfrac></mfenced><mn>2</mn></msup><mo>+</mo><msup><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>B</mi></mrow><mrow><mo>&#8706;</mo><mi>y</mi></mrow></mfrac></mfenced><mn>2</mn></msup></math></p>
+
+			<!-- Latex: g_{xy}=\overrightarrow u\cdot\overrightarrow v=\overrightarrow u^T\cdot\overrightarrow v=\left|\frac{\partial R}{\partial x}\right|\left|\frac{\partial R}{\partial y}\right|+\left|\frac{\partial G}{\partial x}\right|\left|\frac{\partial G}{\partial y}\right|+\left|\frac{\partial B}{\partial x}\right|\left|\frac{\partial B}{\partial y}\right| -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>g</mi><mrow><mi>x</mi><mi>y</mi></mrow></msub><mo>=</mo><mover><mi>u</mi><mo>&#8594;</mo></mover><mo>&#183;</mo><mover><mi>v</mi><mo>&#8594;</mo></mover><mo>=</mo><msup><mover><mi>u</mi><mo>&#8594;</mo></mover><mi>T</mi></msup><mo>&#183;</mo><mover><mi>v</mi><mo>&#8594;</mo></mover><mo>=</mo><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>R</mi></mrow><mrow><mo>&#8706;</mo><mi>x</mi></mrow></mfrac></mfenced><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>R</mi></mrow><mrow><mo>&#8706;</mo><mi>y</mi></mrow></mfrac></mfenced><mo>+</mo><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>G</mi></mrow><mrow><mo>&#8706;</mo><mi>x</mi></mrow></mfrac></mfenced><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>G</mi></mrow><mrow><mo>&#8706;</mo><mi>y</mi></mrow></mfrac></mfenced><mo>+</mo><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>B</mi></mrow><mrow><mo>&#8706;</mo><mi>x</mi></mrow></mfrac></mfenced><mfenced open="|" close="|"><mfrac><mrow><mo>&#8706;</mo><mi>B</mi></mrow><mrow><mo>&#8706;</mo><mi>y</mi></mrow></mfrac></mfenced></math></p>
+
+			<!-- Latex: \theta(x,y)=\frac12\tan^{-1}\left[\frac{2g_{xy}}{\left(g_{xx}-g_{yy}\right)}\right] -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>&#952;</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mi>tan</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mfenced open="[" close="]"><mfrac><mrow><mn>2</mn><msub><mi>g</mi><mrow><mi>x</mi><mi>y</mi></mrow></msub></mrow><mfenced><mrow><msub><mi>g</mi><mrow><mi>x</mi><mi>x</mi></mrow></msub><mo>-</mo><msub><mi>g</mi><mrow><mi>y</mi><mi>y</mi></mrow></msub></mrow></mfenced></mfrac></mfenced></math></p>
+
+			<!-- Latex: F_\theta(x,y)=\left\{\frac12\left[\left(g_{xx}+g_{yy}\right)+\left(g_{xx}-g_{yy}\right)\cos2\theta+2g_{xy}\sin2\theta\right]\right\}^\frac12 -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>F</mi><mi>&#952;</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo><mo>=</mo><msup><mfenced open="{" close="}"><mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mfenced open="[" close="]"><mrow><mfenced><mrow><msub><mi>g</mi><mrow><mi>x</mi><mi>x</mi></mrow></msub><mo>+</mo><msub><mi>g</mi><mrow><mi>y</mi><mi>y</mi></mrow></msub></mrow></mfenced><mo>+</mo><mfenced><mrow><msub><mi>g</mi><mrow><mi>x</mi><mi>x</mi></mrow></msub><mo>-</mo><msub><mi>g</mi><mrow><mi>y</mi><mi>y</mi></mrow></msub></mrow></mfenced><mi>cos</mi><mn>2</mn><mi>&#952;</mi><mo>+</mo><mn>2</mn><msub><mi>g</mi><mrow><mi>x</mi><mi>y</mi></mrow></msub><mi>sin</mi><mn>2</mn><mi>&#952;</mi></mrow></mfenced></mrow></mfenced><mfrac><mn>1</mn><mn>2</mn></mfrac></msup></math></p>
+
+
+			<p><em>F</em> represents the gradient in the &theta; direction, where the gradient has a maximum.</p>
+
+			<p>To calculate the value of <em>F</em> we use the following command:</p>
+
+			<pre><code class="language-matlab">[VG, A, PPG] = colorgrad(f)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the original image, <code class="language-matlab">VG</code> the borders image, <code class="language-matlab">A</code> is the image that represents the value of the angle, and <code class="language-matlab">PPG</code> is an image with the sum of the gradients in gray levels of each one of the color components of the image <code class="language-matlab">f</code>.</p>
+
+			<p>You can practice these concepts using <code class="language-matlab">snippet10</code>.</p>
+				<div class="menu">
+				    <input type="checkbox" id="show">
+					<label for="show" class="arrow doc">{% include doc.svg %} View snippet 10</label>
+					<div class="arrow selected">
+						Download: &nbsp;
+						<a href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include github.svg %}</a> 
+						<a href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}/">{% include bitbucket.svg %}</a> 
+						<a href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include gitlab.svg %}</a> 
+					</div>
+
+					<pre class="contents"><code class="language-matlab">	
+					</code></pre>
+				</div>
+
+
+
+
+
+
+
+
+
+			<nav id="toc">
+
+				<h2>Table of contents</h2>
+
+				<ul class="list">
+					<li><a href="#color">Representation of color in MATLAB</a></li>
+					<li><a href="#colorMaps">Color maps</a></li>
+					<li><a href="#conversion">Representation conversion</a></li>
+					<li><a href="#intensity">Intensity transformations</a></li>
+					<li><a href="#filtering">Color filtering</a></li>
+					<li><a href="#coloredBorders">Colored borders detection</a></li>
+				</ul>
+
+			</nav>
+	
+

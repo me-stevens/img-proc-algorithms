@@ -1,0 +1,24 @@
+# Site settings
+title:       Image processing algorithms
+description: > # this means to ignore newlines until "baseurl:"
+             Image processing algorithms.
+baseurl:     "" # the subpath of your site, e.g. /blog/
+url:         "http://imgprocessing.tk" # the base hostname & protocol for your site
+
+# User names
+git_user:     me-stevens
+git_repo:     img-proc-algorithms
+
+# Build settings
+exclude:  [.gitignore, exclude]
+markdown: kramdown
+sass:
+  style: compressed
+
+# Categories
+topics:
+  "intro":    "Intro"
+  "digital":  "Digital"
+  "analysis": "Analysis"
+  "improve":  "Improve"
+

@@ -1,0 +1,285 @@
+---
+layout: page
+title:  "Region description"
+stitle: "Region description"
+date:   2005-05-13 21:57:36
+mathjax: true
+---
+
+			<h2 id="basics">Basic description</h2>
+
+			<p>Basic properties like area, Euler number, minimum rectangle that wraps the figure,  etc. a region can be defined inside an image. In MATLAB we do this process in the following way:</p>
+
+			<pre><code class="language-matlab">
+B = bwlabel(f);
+D = regionprops(B, properties)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the image that contains the regions that we want to describe. The first thing we do is to convert the image to a representation through labels, using the first command.</p>
+
+			<p>The second command takes that labelled matrix and calculates the properties that we want. For example:</p>
+
+			<pre><code class="language-matlab">D = regionprops(B, 'area', 'boundingbox')</code></pre>
+
+			<p>This would produce a structure like the following:</p>
+
+			<pre><code class="language-matlab">
+D =
+	Area: 19939
+	BoundingBox: [30.5000 19.5000 223 306]</code></pre>
+
+			<p>The properties we want to calculate are listed separated by commas, as shown in the previous example. There are several properties:</p>
+
+			<ul class="list">
+				<li><strong>area:</strong> Calculates the area of the region in squared pixels.</li>
+				<li><strong>boundingbox:</strong> Calculates the position and dimensions of the minimum rectangle that wraps the region.</li>
+				<li><strong>Centroid:</strong> Position of the centroid of the region.</li>
+				<li><strong>ConvexHull:</strong> Matrix with the position of the pixels that define the convex helmet that wrapsthe region.</li>
+				<li><strong>ConvexImage:</strong> Binary image with the shape of a convex helmet.</li>
+				<li><strong>Eccentricity:</strong> Scalar number that gives the eccentricity of the image.</li>
+				<li><strong>EulerNumber:</strong> Scalar that gives the Euler number of the region.</li>
+				<li><strong>MayorAxisLength:</strong> Length of the largest axis of the region.</li>
+				<li><strong>MinorAxisLength:</strong> Length of the smallest axis of the region.</li>
+			</ul>
+
+
+			<h2 id="moments">Invariant moments</h2>
+
+			<!-- Latex: \mu_{pq}=\sum_{x=-\infty}^\infty\sum_{y=-\infty}^\infty\left(x-x_c\right)^2\left(y-y_c\right)^qf(x,y) -->
+
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>&#956;</mi><mrow><mi>p</mi><mi>q</mi></mrow></msub><mo>=</mo><munderover><mo>&#8721;</mo><mrow><mi>x</mi><mo>=</mo><mo>-</mo><mo>&#8734;</mo></mrow><mo>&#8734;</mo></munderover><munderover><mo>&#8721;</mo><mrow><mi>y</mi><mo>=</mo><mo>-</mo><mo>&#8734;</mo></mrow><mo>&#8734;</mo></munderover><msup><mfenced><mrow><mi>x</mi><mo>-</mo><msub><mi>x</mi><mi>c</mi></msub></mrow></mfenced><mn>2</mn></msup><msup><mfenced><mrow><mi>y</mi><mo>-</mo><msub><mi>y</mi><mi>c</mi></msub></mrow></mfenced><mi>q</mi></msup><mi>f</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo></math></p>
+
+			<!-- Latex: \eta_{pq}=\;\frac{\eta_{pq}}{\eta_{00}^y} -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>&#951;</mi><mrow><mi>p</mi><mi>q</mi></mrow></msub><mo>=</mo><mo>&#160;</mo><mfrac><msub><mi>&#951;</mi><mrow><mi>p</mi><mi>q</mi></mrow></msub><msup><msub><mi>&#951;</mi><mn>00</mn></msub><mi>y</mi></msup></mfrac></math></p>
+
+			<p>The following six moments give us six different numeric values that are insensitive to image transformations like scale changes, mirroring and rotation:</p>
+
+			<!-- Latex: \phi_1=\eta_{20}+\eta_{02} -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>&#981;</mi><mn>1</mn></msub><mo>=</mo><msub><mi>&#951;</mi><mn>20</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>02</mn></msub></math></p>
+
+			<!-- Latex: \phi_2=\left(\eta_{20}-\eta_{02}\right)^2+4\eta_{11}^2 -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>&#981;</mi><mn>2</mn></msub><mo>=</mo><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>20</mn></msub><mo>-</mo><msub><mi>&#951;</mi><mn>02</mn></msub></mrow></mfenced><mn>2</mn></msup><mo>+</mo><mn>4</mn><msubsup><mi>&#951;</mi><mn>11</mn><mn>2</mn></msubsup></math></p>
+
+			<!-- Latex: \phi_3=\left(\eta_{30}-3\eta_{12}\right)^2+\left(3\eta_{21}-\eta_{30}\right)^2 -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>&#981;</mi><mn>3</mn></msub><mo>=</mo><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>30</mn></msub><mo>-</mo><mn>3</mn><msub><mi>&#951;</mi><mn>12</mn></msub></mrow></mfenced><mn>2</mn></msup><mo>+</mo><msup><mfenced><mrow><mn>3</mn><msub><mi>&#951;</mi><mn>21</mn></msub><mo>-</mo><msub><mi>&#951;</mi><mn>30</mn></msub></mrow></mfenced><mn>2</mn></msup></math></p>
+
+			<!-- Latex: \phi_4=\left(\eta_{30}+\eta_{12}\right)^2+\left(\eta_{21}+\eta_{30}\right)^2 -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>&#981;</mi><mn>4</mn></msub><mo>=</mo><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>30</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>12</mn></msub></mrow></mfenced><mn>2</mn></msup><mo>+</mo><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>21</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>30</mn></msub></mrow></mfenced><mn>2</mn></msup></math></p>
+
+			<!-- Latex: \phi_5=\left(\eta_{30}-3\eta_{12}\right)\left(\eta_{30}+\eta_{12}\right)\left[\left(\eta_{30}+\eta_{12}\right)^2-3\left(\eta_{21}+\eta_{30}\right)^2\right]+\left(3\eta_{21}-\eta_{03}\right)\left(\eta_{21}+\eta_{03}\right)\left[3\left(\eta_{30}+\eta_{12}\right)^2-\left(\eta_{21}+\eta_{03}\right)^2\right] -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>&#981;</mi><mn>5</mn></msub><mo>=</mo><mfenced><mrow><msub><mi>&#951;</mi><mn>30</mn></msub><mo>-</mo><mn>3</mn><msub><mi>&#951;</mi><mn>12</mn></msub></mrow></mfenced><mfenced><mrow><msub><mi>&#951;</mi><mn>30</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>12</mn></msub></mrow></mfenced><mfenced open="[" close="]"><mrow><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>30</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>12</mn></msub></mrow></mfenced><mn>2</mn></msup><mo>-</mo><mn>3</mn><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>21</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>30</mn></msub></mrow></mfenced><mn>2</mn></msup></mrow></mfenced><mo>+</mo><mfenced><mrow><mn>3</mn><msub><mi>&#951;</mi><mn>21</mn></msub><mo>-</mo><msub><mi>&#951;</mi><mn>03</mn></msub></mrow></mfenced><mfenced><mrow><msub><mi>&#951;</mi><mn>21</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>03</mn></msub></mrow></mfenced><mfenced open="[" close="]"><mrow><mn>3</mn><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>30</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>12</mn></msub></mrow></mfenced><mn>2</mn></msup><mo>-</mo><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>21</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>03</mn></msub></mrow></mfenced><mn>2</mn></msup></mrow></mfenced></math></p>
+
+			<!-- Latex: \phi_6=\left(\eta_{20}-\eta_{02}\right)\left[\left(\eta_{30}+\eta_{12}\right)^2-\left(\eta_{21}+\eta_{03}\right)^2\right]+4\eta_{11}\left(\eta_{30}+\eta_{12}\left(\eta_{21}+\eta_{03}\right)\right) -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>&#981;</mi><mn>6</mn></msub><mo>=</mo><mfenced><mrow><msub><mi>&#951;</mi><mn>20</mn></msub><mo>-</mo><msub><mi>&#951;</mi><mn>02</mn></msub></mrow></mfenced><mfenced open="[" close="]"><mrow><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>30</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>12</mn></msub></mrow></mfenced><mn>2</mn></msup><mo>-</mo><msup><mfenced><mrow><msub><mi>&#951;</mi><mn>21</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>03</mn></msub></mrow></mfenced><mn>2</mn></msup></mrow></mfenced><mo>+</mo><mn>4</mn><msub><mi>&#951;</mi><mn>11</mn></msub><mfenced><mrow><msub><mi>&#951;</mi><mn>30</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>12</mn></msub><mfenced><mrow><msub><mi>&#951;</mi><mn>21</mn></msub><mo>+</mo><msub><mi>&#951;</mi><mn>03</mn></msub></mrow></mfenced></mrow></mfenced></math></p>
+
+
+			<h2 id="mainComponents">Main Components</h2>
+
+			<p>We can describe an image using main componets. Suppose we have a group of images and we build the following group of matrices:</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/mainComponents.png" width="834" height="448" alt="Snapshot of MATLAB interface"></p>
+
+			<p>The average vector would be:</p>
+
+			<!-- Latex: m_x=\frac1K\overset K{\underset{k=1}{\sum x_k}} -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>m</mi><mi>x</mi></msub><mo>=</mo><mfrac><mn>1</mn><mi>K</mi></mfrac><munderover><mrow><mo>&#8721;</mo><msub><mi>x</mi><mi>k</mi></msub></mrow><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover></math></p>
+
+			<p>where <em>K = MN</em>. Then, the covariance matrix can be built, with a size of mxm, like this:</p>
+
+			<!-- Latex: C_x=\frac1{K-1}\sum_{k=1}^KK\left(x_k-m_x\right)\left(x_k-m_x\right)^T -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>C</mi><mi>x</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>K</mi><mo>-</mo><mn>1</mn></mrow></mfrac><munderover><mo>&#8721;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><mi>K</mi><mfenced><mrow><msub><mi>x</mi><mi>k</mi></msub><mo>-</mo><msub><mi>m</mi><mi>x</mi></msub></mrow></mfenced><msup><mfenced><mrow><msub><mi>x</mi><mi>k</mi></msub><mo>-</mo><msub><mi>m</mi><mi>x</mi></msub></mrow></mfenced><mi>T</mi></msup></math></p>
+
+			<p>The eigenvalues and eigenvectors would then be:</p>
+
+			<!-- Latex: y=A\left(x-m_x\right) -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>y</mi><mo>=</mo><mi>A</mi><mfenced><mrow><mi>x</mi><mo>-</mo><msub><mi>m</mi><mi>x</mi></msub></mrow></mfenced></math></p>
+
+			<!-- Latex: x=A^Ty+m_x -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>=</mo><msup><mi>A</mi><mi>T</mi></msup><mi>y</mi><mo>+</mo><msub><mi>m</mi><mi>x</mi></msub></math></p>
+
+			<p>We can reduce the number of eigenvalues to <em>q</em>. Then, the previous equation would turn into:</p>
+
+			<!-- Latex: \widehat x=A_q^Ty+m_x -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><mover><mi>x</mi><mo>^</mo></mover><mo>=</mo><msup><msub><mi>A</mi><mi>q</mi></msub><mi>T</mi></msup><mi>y</mi><mo>+</mo><msub><mi>m</mi><mi>x</mi></msub></math></p>
+
+
+			<p>If we stay with the main eigenvalues (the largest ones), we can obtain a reduced group of images that have the most relevant information. At the same time, this eigenvalues characterize the properties of the images.</p>
+
+			<p>The following command in MATLAB makes all the necessary calculations:</p>
+
+			<pre><code class="language-matlab">P = princomp(X,q)</code></pre>
+
+			<p>where <code class="language-matlab">X</code> is a matrix that contains the vectors <code class="language-matlab">x</code> of the previous expressions, <code class="language-matlab">q</code> is the number of eigenvalues that we want to obtain, and <code class="language-matlab">P</code> is a structure that contains several things:</p>
+
+			<ul class="list">
+				<li><code class="language-matlab">P.Y</code> K by Q matrices whose columns are the main eigenvectors.</li>
+				<li><code class="language-matlab">P.Cx</code> m by m covariance matrix.</li>
+				<li><code class="language-matlab">P.X</code> K by m, matrix whose rows are the vectors that were rebuilt from the eigenvalues.</li>
+			</ul>
+
+
+
+				<p>You can practice these concepts using <code class="language-matlab">snippet08</code>.</p>
+				<div class="menu">
+				    <input type="checkbox" id="show">
+					<label for="show" class="arrow doc">{% include doc.svg %} View snippet 08</label>
+					<div class="arrow selected">
+						Download: &nbsp;
+						<a href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include github.svg %}</a> 
+						<a href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}/">{% include bitbucket.svg %}</a> 
+						<a href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include gitlab.svg %}</a> 
+					</div>
+
+					<pre class="contents"><code class="language-matlab">
+% Load image
+f = imread('chromosome.jpg');
+figure, imshow(f);
+
+% Filtering
+f  = im2double(f);
+h  = fspecial('gaussian', 15, 9);
+g1 = imfilter(f, h, 'replicate');
+figure, imshow(g1);
+
+g2 = im2bw(g1, 0.7);
+figure, imshow(g2);
+
+% Property calculations
+g2_B = bwlabel(g2);
+figure, imshow(g2_B);
+D = regionprops(g2_B, 'area', 'boundingbox', 'Centroid', 'EulerNumber')
+
+% Load image
+f = imread('stillLife.jpg');
+
+g3 = f(1:2:end,1:2:end);
+g3_fhsp = padarray(g3, [184 184], 'both');
+figure, imshow(g3_fhsp);
+
+% Mirroring
+i1 = fliplr(f);
+i1_fhsp = padarray(i1, [84 84], 'both');
+figure, imshow(i1_fhsp);
+
+% Rotate
+i2 = imrotate(f, 45, 'bilinear');
+figure, imshow(i2);
+
+i3 = imrotate(f, 2, 'bilinear');
+figure, imshow(i3);
+
+i3_fhsp = padarray(i3, [76 76], 'both');
+figure, imshow(i3_fhsp);
+
+% Moments
+moments = abs(log(invmoments(f)))
+
+g    = f(1:2:end,1:2:end);
+fhsp = padarray(g, [184 184], 'both');
+moments = abs(log(invmoments(fhsp)))
+
+fm   = fliplr(f);
+fhsp = padarray(fm, [84 84], 'both');
+moments = abs(log(invmoments(fhsp)))
+
+g = imrotate(f, 45, 'bilinear');
+moments = abs(log(invmoments(g)))
+
+g    = imrotate(f, 2, 'bilinear');
+fhsp = padarray(g, [76 76], 'both');
+moments = abs(log(invmoments(fhsp)))
+
+% Loading
+f1 = imread('satellite1.jpg');
+f2 = imread('satellite2.jpg');
+f3 = imread('satellite3.jpg');
+f4 = imread('satellite4.jpg');
+f5 = imread('satellite5.jpg');
+f6 = imread('satellite6.jpg');
+
+% Multivector image structure
+S = cat(3,f1,f2,f3,f4,f5,f6);
+[X, R] = imstack2vectors(S);
+
+% Main components
+P  = princomp(X, 6);
+
+j1 = P.Y(:,1);
+j1 = reshape(j1, 512, 512);
+figure, imshow(j1,[]);
+
+j2 = P.Y(:,2);
+j2 = reshape(j2, 512, 512);
+figure, imshow(j2,[]);
+
+j3 = P.Y(:,3);
+j3 = reshape(j3, 512, 512);
+figure, imshow(j3,[]);
+
+j4 = P.Y(:,3);
+j4 = reshape(j4, 512, 512);
+figure, imshow(j4,[]);
+
+j5 = P.Y(:,5);
+j5 = reshape(j5, 512, 512);
+figure, imshow(j5,[]);
+
+j6 = P.Y(:,6);
+j6 = reshape(j6, 512, 512);
+figure, imshow(j6,[]);
+
+d = diag(P.Cy)
+
+% Repeat for a value of 2
+Q = princomp(X, 2);
+
+q1 = Q.Y(:,1);
+q1 = reshape(q1, 512, 512);
+figure, imshow(q1,[]);
+
+q2 = Q.Y(:,2);
+q2 = reshape(q2, 512, 512);
+figure, imshow(q2,[]);
+
+d = diag(Q.Cy)
+
+% Reconstructed images
+r1 = Q.X(:,1);
+r1 = reshape(r1, 512, 512);
+figure, imshow(r1,[]);
+
+r2 = Q.X(:,2);
+r2 = reshape(r2, 512, 512);
+figure, imshow(r2,[]);
+
+r3 = Q.X(:,3);
+r3 = reshape(r3, 512, 512);
+figure, imshow(r3,[]);
+
+r4 = Q.X(:,4);
+r4 = reshape(r4, 512, 512);
+figure, imshow(r4,[]);
+
+r5 = Q.X(:,5);
+r5 = reshape(r5, 512, 512);
+figure, imshow(r5,[]);
+
+r6 = Q.X(:,6);
+r6 = reshape(r6, 512, 512);
+figure, imshow(r6,[]);</code></pre>
+				</div>
+
+
+
+			<nav id="toc">
+
+				<h2>Table of contents</h2>
+
+				<ul class="list">
+					<li><a href="#basics">Basic description</a></li>
+					<li><a href="#moments">Invariant moments</a></li>
+					<li><a href="#mainComponents">Main Components</a></li>
+				</ul>
+
+			</nav>
+	
+

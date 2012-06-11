@@ -1,0 +1,414 @@
+---
+layout: page
+title:  "Border description"
+stitle: "Border description"
+date:   2005-05-06 12:17:03
+---
+
+			<p>We are going to describe the borders of the outlines of the previous images.</p>
+
+			<h2 id="cellArray">Cell array</h2>
+
+			<p>A <strong>cell array</strong> is a matrix of matrices. For example, the following cell array:</p>
+
+			<pre><code class="language-matlab">
+>> C = {x1, x2, x3}
+>> C
+C =
+	[512x512  uint8]
+	[   12x3 double]
+	[    1x4 double]</code></pre>
+
+			<p><code class="language-matlab">C</code> contains three matrices: <code class="language-matlab">x1</code>, <code class="language-matlab">x2</code>, and <code class="language-matlab">x3</code>. The first matrix contains an image of size 512x512 of type uint8. The second matrix is an image of size 12x3 in double format, and x3 is a vector of type double.</p>
+
+			<p>To get  any of the three elements, we type:</p>
+
+			<pre><code class="language-matlab">
+>> C{3}
+ans =
+	1	2	3	4</code></pre>
+
+			<p>With the <code class="language-matlab">boundaries.p</code> command, we can return a cell array where each element contains all the closed borders detected in the image (two-column vectors containing the (x,y) values of the outline).</p>
+
+
+
+			<h2 id="cellFun">Cell fun</h2>
+
+			<pre><code class="language-matlab">
+d = cellfun(’length’, B);
+[max_d, k] = max(d);
+b = B{k};</code></pre>
+
+			<p>This function returns a vector with the length of each element of the cell array <code class="language-matlab">x2</code>. With the function <code class="language-matlab">max</code> we are determining the element with the largest dimension, and the index of said element. Inthe las line, we select the largest closed border detected in the image.</p>
+
+			<p>To see the biggest border, we use:</p>
+
+			<pre><code class="language-matlab">
+[M N] = size(g);
+g2 = bound2im(b, M, N, min(b(:,1)), min(b(:,2)));
+figure, imshow(g2);</code></pre>
+
+			<p>This command creates an image with the border in white and the rest of the pixels in black. Since we don't have the imformation on the size of the image, we pass it the width and height through <code class="language-matlab">M</code> and <code class="language-matlab">N</code>. For <code class="language-matlab">bound2im</code> to draw the image correctly, we need to know the minimum coordinates in both the <code class="language-matlab">x</code> and the <code class="language-matlab">y</code> axis. Those two parameters are passed through <code class="language-matlab">min(b(:,1))</code> and <code class="language-matlab">min(b(:,2))</code></p>
+
+
+
+			<h2 id="reduction">Border reduction</h2>
+
+			<p>Sometimes the border obtained before has too much information and we would like to reduce it. For that we can use the MATLAB command:</p>
+
+			<pre><code class="language-matlab">[s, su] = bsubsamp(b, 50)</code></pre>
+
+			<p>It takes samples of the border every 50 pixels and returns two matrices: <code class="language-matlab">s</code>, that contains the new reduced border, and <code class="language-matlab">su</code>, which contains the points that form the border, but with their separation scaled so that it's unitary.</p>
+
+			<p>Since the previous image doesn't represent well the borders, we join the points with a polygon, using:</p>
+
+			<pre><code class="language-matlab">cn = connectpoly(s(:,1), s(:,2))</code></pre>
+
+			<p>where we introduce the coordinates x and y separately. The result, <code class="language-matlab">cn</code>, is a closed border.</p>
+
+
+
+			<h2 id="chain">Freeman's chain code</h2>
+
+			<p>Given a border like the previous polygon, the Freeman chain code algorithm tells us how much the angle varies from point to point. These angles are normally in representations of 0, 90, 180, 270 degrees, or in 0, 45, 90, 135, 180, 225, 270 and 315 degrees:</p>
+
+
+			<p class="center"><img src="{{ site.baseurl}}/img/freemanAngles.png" width="545" height="279" alt="Freeman angles representation"><br>
+			<span class="small"> Directions of vicinity: To the left, vicinity 4, to the right, vivinity 8.</p>
+
+			<pre><code class="language-matlab">c = fchcode(su)</code></pre>
+
+			<p>Here, <code class="language-matlab">su</code> is the polygon border and <code class="language-matlab">c</code> is a structure that contains the following information:</p>
+
+			<ul class="list">
+				<li><code class="language-matlab">c.fcc</code>: Representation of the chain.</li>
+				<li><code class="language-matlab">c.diff</code>: First difference of <code class="language-matlab">c.fcc</code>.</li>
+				<li><code class="language-matlab">c.mm</code>: Representation of the chain as the smallest possible integer.</li>
+				<li><code class="language-matlab">c.diffmm</code>: First difference of <code class="language-matlab">c.mm</code>.</li>
+				<li><code class="language-matlab">c.x0y0</code>: Coordinates where the chain starts.</li>
+			</ul>
+
+			<p>They are all vectors of dimension <code class="language-matlab">n</code>, except the last one, that has a dimension of 2. For example:</p>
+
+			<pre><code class="language-matlab">
+c = 
+
+      x0y0: [7 3]
+       fcc: [1x32 double]
+      diff: [1x32 double]
+        mm: [1x32 double]
+    diffmm: [1x32 double]</code></pre>
+
+			<p>Imagine that the first pixel makes and angle of 45 degrees with the second pixel. Then the first element of our chain will have a value of 1 in a vicinity of 8. Now, the second pixel has an angle of 0 degrees with respect to the third pixel. Our chain now has a value of 10. We do this for all the pixels of the polygon to obtain <code class="language-matlab">c.fcc</code>.</p>
+
+			<p>This is not invariant to image rotations, so we have to take the angle difference to model the chain. This difference is calculated counting the number of changes of direction (anticlockwise) that separate two neighbour elements in the chain. For example, if we are counting only 4 directions in our chain, a chain code of 10103322 would be 3133030 once we convert it to angle differences.</p>
+
+			<p>The <code class="language-matlab">c.mm</code> representation also allow us to make chains more stable against changes or transformations in our images. Since the pixel where we stat to create the chain is random, <code class="language-matlab">c.mm</code> starts the chain from the smallest pixel created by the chain code.</p>
+
+
+			<h2 id="vicinities">Vicinity of 4 and 8</h2>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/vicinity.png" width="510" height="235" alt="Vicinity of 4 and 8"><br>
+			<span class="small"> To the left, a vicinity of 4 only considers the pixels in the directions -180, 180, 90 and -90 degrees. To the right, a vicinity of 8 considers also the pixels at angles of -45, 45, 135 and -135 degrees.</p>
+
+			<pre><code class="language-matlab">b = boundaries(f, vicinity, direction)</code></pre>
+
+			<p>Here, <code class="language-matlab">vicinity</code> can be 4 or 8, as shown in the figure. The parameter <code class="language-matlab">direction</code> indicates the direction towards which the border is going to be searched, and it can be clockwise (<code class="language-matlab">'cw'</code>) or counter-clockwise (<code class="language-matlab">'ccw'</code>).
+
+
+			<h2 id="polygon">Polygon representation</h2>
+
+			<pre><code class="language-matlab">[x, y] = minperpoly(f, cellsize)</code></pre>
+
+			<p>With this command we can make a representation in polygons of an image, where <code class="language-matlab">cellsize</code> is the minimum division to apply to the image in order to calculate the polygons. The algorithm uses a decomposition in <em>quadtrees</em>. It returns the coordinates where the polygon vertices are, in two vectors with the coordinates in the X and Y axis respectively.</p>
+
+
+			<h2 id="signature">Border signature</h2>
+
+			<p>A signature is a way to describe a closed border. Basically it checks how the distance to the centroid varies with respect to the angle.</p>
+
+			<pre><code class="language-matlab">
+[st, angle, x0, y0] = signature(b);
+figure, plot(angle, st)</code></pre>
+
+			<p>where <code class="language-matlab">b</code> is the border, <code class="language-matlab">st</code> is the signature, <code class="language-matlab">angle</code> is the value in which the angle is sampled, and <code class="language-matlab">x0</code> and <code class="language-matlab">y0</code> is the point of the image with respect to which the measurements have been done.</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/signature.png" width="525" height="304" alt="Signature of two different figures"></p>
+
+			<h2 id="fourier">Fourier decomposition</h2>
+
+			<pre><code class="language-matlab">z = frdescp(b)</code></pre>
+
+			<p>Here, <code class="language-matlab">b</code> is the outline that we want to decompose and <code class="language-matlab">z</code> is the decomposition of said outline.</p>
+
+			<p>We can also calculate the inverse transform:</p>
+
+			<pre><code class="language-matlab">bn = ifrdescp(z, num)</code></pre>
+
+			<p>where <code class="language-matlab">z</code> is the Fourier decomposition of an outline, and <code class="language-matlab">num</code> is the number of components that we want to use to recreate that outline in the spatial domain. The more elements we add, the larger amount of details we will take from our environment.</p>
+
+
+
+			<p>You can practice these concepts using <code class="language-matlab">snippet07</code>.</p>
+				<div class="menu">
+				    <input type="checkbox" id="show">
+					<label for="show" class="arrow doc">{% include doc.svg %} View snippet 07</label>
+					<div class="arrow selected">
+						Download: &nbsp;
+						<a href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include github.svg %}</a> 
+						<a href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}/">{% include bitbucket.svg %}</a> 
+						<a href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include gitlab.svg %}</a> 
+					</div>
+
+					<pre class="contents"><code class="language-matlab">
+% Load image
+f = imread('circle.jpg');
+imshow(f);
+
+% Average filter and extend borders with replicate
+w = fspecial('average')
+g = imfilter(f, w, 'replicate');
+imshow(g);
+
+% Cell Array
+h1 = im2bw(g, 0.5);
+figure, imshow(h1);
+B = boundaries(h1)
+B = 
+
+    [   3x2 double]
+    [  36x2 double]
+    [  47x2 double]
+    [  31x2 double]
+    [  13x2 double]
+    [   4x2 double]
+    [   9x2 double]
+    [  23x2 double]
+    [   5x2 double]
+    [   3x2 double]
+    [  24x2 double]
+    [   5x2 double]
+    [  14x2 double]
+    [1376x2 double]
+    [   7x2 double]
+    [   9x2 double]
+	... etc
+
+B{2}
+ans =
+
+   288    10
+   287    11
+   286    11
+   285    11
+   284    11
+   283    11
+   282    12
+   281    12
+   280    12
+   279    12
+   278    13
+   277    13
+   276    13
+   277    13
+   278    13
+   279    13
+   280    13
+   281    12
+   282    12
+   283    12
+   284    12
+   285    11
+   286    11
+   287    11
+   288    11
+   289    11
+   290    10
+   291    10
+   290    10
+   289    10
+   288    10
+
+% Cell fun
+d = cellfun('length', B)
+[max_d, k] = max(d)
+b = B{k};
+
+[M N] = size(g);
+h2 = bound2im(b, M, N, min(b(:,1)), min(b(:,2)));
+figure, imshow(h2);
+
+% Outline reduction
+[s, su] = bsubsamp(b, 50);
+i1 = bound2im(s, M, N, min(s(:,1)), min(s(:,2)));
+figure, imshow(i1);
+
+cn = connectpoly(s(:,1), s(:,2));
+i2 = bound2im(cn, M, N, min(cn(:,1)), min(cn(:,2)));
+figure, imshow(i2);
+
+% Chain code
+c = fchcode(su);
+c.fcc
+c.diff
+c.mm
+c.diffmm
+c.x0y0
+
+% Load image
+f = imread('leaf.jpg');
+figure, imshow(f);
+
+% Boundaries
+j1 = im2bw(f, 0.5);
+figure, imshow(j1);
+
+b = boundaries(j1, 4, 'cw');
+d = cellfun('length', b)
+[max_d, k] = max(d)
+b = b{k};
+[M N] = size(j1);
+j2 = bound2im(b, M, N, min(b(:,1)), min(b(:,2)));
+figure, imshow(j2);
+
+% Polygon representation
+[x, y] = minperpoly(f, 2);
+b2  = connectpoly(x,y);
+kB1 = bound2im(b2, M, N, min(x), min(y));
+figure, imshow(kB1);
+
+[x, y] = minperpoly(f, 3);
+b2  = connectpoly(x,y);
+kB2 = bound2im(b2, M, N, min(x), min(y));
+figure, imshow(kB2);
+
+[x, y] = minperpoly(f, 4);
+b2  = connectpoly(x,y);
+kB3 = bound2im(b2, M, N, min(x), min(y));
+figure, imshow(kB3);
+
+[x, y] = minperpoly(f, 8);
+b2  = connectpoly(x,y);
+kB4 = bound2im(b2, M, N, min(x), min(y));
+figure, imshow(kB4);
+
+% Load image
+f = imread('border1.jpg');
+figure, imshow(f);
+
+l1 = im2bw(f, 0.5);
+figure, imshow(l1);
+
+B = boundaries(l1)
+d = cellfun('length', B)
+[max_d, k] = max(d)
+b = B{k};
+[M N] = size(l1);
+l2 = bound2im(b, M, N, min(b(:,1)), min(b(:,2)));
+figure, imshow(l2);
+
+% Signature
+[st, angle, x0, y0] = signature(b);
+x0
+y0
+figure, plot(angle, st);
+xlabel('Angle');
+ylabel('Signature');
+title('SIGNATURE CALCULATION');
+
+% Load image
+f = imread('border2.jpg');
+figure, imshow(f);
+
+n1 = im2bw(f, 0.5);
+figure, imshow(n1);
+
+B = boundaries(n1)
+d = cellfun('length', B)
+[max_d, k] = max(d)
+b = B{k};
+[M N] = size(n1);
+n2 = bound2im(b, M, N, min(b(:,1)), min(b(:,2)));
+figure, imshow(n2);
+
+[st, angle, x0, y0] = signature(b);
+x0
+y0
+figure, plot(angle, st);
+xlabel('Angle');
+ylabel('Signature');
+title('SIGNATURE CALCULATION');
+
+% Load image
+f = imread ('chromosome.jpg');
+figure, imshow(f);
+
+% Gaussian filter
+f = im2double(f);
+h = fspecial('gaussian', 15, 9);
+o1 = imfilter(f, h, 'replicate');
+figure, imshow(o1);
+
+o2 = im2bw(o1, 0.7);
+figure, imshow(o2);
+
+% More gaussians
+p1 = im2bw(o1, 0.5);
+figure, imshow(p1);
+
+B = boundaries(p1)
+d = cellfun('length', B)
+[max_d, k] = max(d)
+b = B{k};
+[M N] = size(o1);
+p2 = bound2im(b, M, N, min(b(:,1)), min(b(:,2)));
+figure, imshow(p2);
+
+% Fourier decomposition of the outline
+z  = frdescp(b);
+bn = ifrdescp(z, 546);
+q1 = bound2im(bn, 344, 270);
+figure, imshow(q1);
+
+% Repeat
+bn = ifrdescp(z, 110);
+q2 = bound2im(bn, 344, 270);
+figure, imshow(q2);
+
+bn = ifrdescp(z, 56);
+q3 = bound2im(bn, 344, 270);
+figure, imshow(q3);
+
+bn = ifrdescp(z, 28);
+q4 = bound2im(bn, 344, 270);
+figure, imshow(q4);
+
+bn = ifrdescp(z, 14);
+q5 = bound2im(bn, 344, 270);
+figure, imshow(q5);
+
+bn = ifrdescp(z, 8);
+q6 = bound2im(bn, 344, 270);
+figure, imshow(q6);</code></pre>
+				</div>
+	
+
+
+
+			<nav id="toc">
+
+				<h2>Table of contents</h2>
+
+				<ul class="list">
+					<li><a href="#cellArray">Cell Array</a></li>
+					<li><a href="#cellFun">Cell fun</a></li>
+					<li><a href="#chain">Freeman chain code</a></li>
+					<li><a href="#vicinities">Vicinity of 4 and 8</a></li>
+					<li><a href="#polygon">Polygon representation</a></li>
+					<li><a href="#signature">Border signature</a></li>
+					<li><a href="#fourier">Fourier decomposition</a></li>
+				</ul>
+
+			</nav>
+	
+

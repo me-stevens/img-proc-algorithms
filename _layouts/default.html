@@ -1,0 +1,28 @@
+<!doctype html>
+<html class="no-js" lang="">
+{% include head.html %}
+
+	<body id="top">
+		<!--[if lt IE 8]>
+			<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+		<![endif]-->
+
+{% include header.html %}
+
+  		<div class="wrapper">
+
+{{ content }}
+
+		</div>
+
+{% include footer.html %}
+
+{% include statcounter.html %}
+
+{% if page.url != "/index.html" and page.url != "/404.html" %}
+		<script src="{{ '/js/vendor/prism.js' | prepend: site.baseurl }}"></script>{% endif %}
+{% if page.mathjax %}
+		<script async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>{% endif %}
+
+	</body>
+</html>

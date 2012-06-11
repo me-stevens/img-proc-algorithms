@@ -1,0 +1,350 @@
+---
+layout:  page
+title:   "Basic manipulation of images in MATLAB"
+stitle:  "Images in MATLAB"
+date:    2005-03-18 18:35:05
+mathjax: true
+---
+
+			<p>The objective of this part is to be familiarized with basic read/write operations on images in MATLAB, and learn the type of images supported as well as some basic operations over them.</p>
+
+			<h2 id="basics">Basics</h2>
+	
+			<p>Images have a size in pixels, that we usually express as <code class="language-bash">NxM</code>. In MATLAB, every image is nothing but a matrix. Each element of the matrix is the gray tone for images in B/W, or, if it is a color image, it can be represented by three matrixes, where each matrix represents one of the three primary colors (red, green, blue or RGB).</p>
+
+			<p class="center"><img src="{{ site.baseurl }}/img/img.png" width="314" height="447" alt="An image of a rose and its matrix equivalent"></p>
+
+			<p>To read an image from disk, we can use <code class="language-matlab">imread</code>:</p>
+
+			<pre><code class="language-matlab">>> f = imread('chestxray.jpg')
+>> f = imread('D:\imagenes\chestxray.jpg')
+>> f = imread('/home/user/chestxray.jpg')</code></pre>
+
+			<p>If the image is B/W, MATLAB will create a matrix <code class="language-bash">f</code>, where each element will have a value of gray:</p>
+
+			<!-- f=\begin{bmatrix}f(1,1)&f(1,2)&\cdots&f(1,N)\\f(2,1)&f(2,2)&\cdots&f(2,N)\\\vdots&\vdots&&\vdots\\f(M,1)&f(M,2)&\cdots&f(M,N)\end{bmatrix} -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>f</mi><mo>=</mo><mfenced open="[" close="]"><mtable><mtr><mtd><mi>f</mi><mo>(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo>)</mo></mtd><mtd><mi>f</mi><mo>(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>)</mo></mtd><mtd><mo>&#8943;</mo></mtd><mtd><mi>f</mi><mo>(</mo><mn>1</mn><mo>,</mo><mi>N</mi><mo>)</mo></mtd></mtr><mtr><mtd><mi>f</mi><mo>(</mo><mn>2</mn><mo>,</mo><mn>1</mn><mo>)</mo></mtd><mtd><mi>f</mi><mo>(</mo><mn>2</mn><mo>,</mo><mn>2</mn><mo>)</mo></mtd><mtd><mo>&#8943;</mo></mtd><mtd><mi>f</mi><mo>(</mo><mn>2</mn><mo>,</mo><mi>N</mi><mo>)</mo></mtd></mtr><mtr><mtd><mo>&#8942;</mo></mtd><mtd><mo>&#8942;</mo></mtd><mtd/><mtd><mo>&#8942;</mo></mtd></mtr><mtr><mtd><mi>f</mi><mo>(</mo><mi>M</mi><mo>,</mo><mn>1</mn><mo>)</mo></mtd><mtd><mi>f</mi><mo>(</mo><mi>M</mi><mo>,</mo><mn>2</mn><mo>)</mo></mtd><mtd><mo>&#8943;</mo></mtd><mtd><mi>f</mi><mo>(</mo><mi>M</mi><mo>,</mo><mi>N</mi><mo>)</mo></mtd></mtr></mtable></mfenced></math></p>
+
+			<p>Now we can check the size of the image:</p>
+
+			<pre><code class="language-matlab">>>size(f)
+	ans =
+		1024 1024</code></pre>
+
+			<p>We can save the size in a variable:</p>
+
+			<pre><code class="language-matlab">>>[M, N] = size(f)</code></pre>
+
+			<p>We could also save the number of colors of the image with the same command:</p>
+
+			<pre><code class="language-matlab">>>[M, N, c] = size(f)</code></pre>
+
+			<p>And if we want detailed information about the image:</p>
+
+			<pre><code class="language-matlab">>>whos f
+  Name Size       Bytes    Class
+  f    249x500    373500   uint8 array
+Grand total is 373500 elements using 373500 bytes</code></pre>
+
+
+
+
+
+
+			<h2 id="displaying">Displaying images</h2>
+			<p>We may want to display our image or apply effects to it. We can do that with <code class="language-matlab">imshow()</code>:</p>
+
+			<pre><code class="language-matlab">imshow(f,G)</code></pre>
+
+			<p><code class="language-bash">f</code> is the image and <code class="language-bash">G</code> is the number of intensity levels to show. If <code class="language-bash">G</code> is not specified, 256 is used. The syntax is:</p>
+
+			<pre><code class="language-matlab">imshow(f,[low high])</code></pre>
+
+			<p>For example:</p>
+						
+			<p class="center">
+				<img src="{{ site.baseurl }}/img/imshow1.png" width="413" height="225" alt="An image of a rose with imshow(f) and the same image after applying the imshow(f, [0,50]) filter"><br>
+				<code class="language-matlab">imshow(f)</code> <code class="language-matlab" style="margin-right: -4em;">imshow(f,[0,50])</code></p>
+
+			<p>If we want to expand the dynamic range, we can leave the brackets empty. That will use the minimum intensity value of the image as the low limit, and the maximum value as the high limit:</p>
+
+			<p class="center">
+				<img src="{{ site.baseurl }}/img/imshow2.png" width="413" height="225" alt="An x-ray image of a chest with imshow(f) and the same image after applying the imshow(f, []) filter"><br>
+				<code class="language-matlab">imshow(f)</code> <code class="language-matlab" style="margin-right: -1.5em;">imshow(f,[])</code></p>
+
+			<p>Another interesting function is <code class="language-matlab">pixval</code>, which affects the last loaded image. When you run it in the console, you can see the value of the intensity when the mouse hovers a particular pixel. It can also measure the euclidean distance between two points.</p>
+
+			<p>Finally, when a new image is loaded, MATLAB overwrites the window of the previously loaded image. To avoid this, and open a new image in an independent window, do:</p>
+
+			<pre><code class="language-matlab">>> figure, imshow(f)</code></pre>
+
+
+
+
+
+
+
+
+			<h2 id="saving">Saving images</h2>
+			<p>To save an image:</p>
+
+			<pre><code class="language-matlab">>> imwrite(f, 'filename')</code></pre>
+
+			<p>If <code class="language-matlab">'filename'</code> doesn't have an extension that MATLAB recognizes, use:</p>
+
+			<pre><code class="language-matlab">>> imwrite(f, 'filename', 'tif')</code></pre>
+
+			<p>We'll be working mainly with JPEG files, in which case you can also specify the quality:</p>
+
+			<pre><code class="language-matlab">>> imwrite(f, 'filename.jpg', 'quality', q)</code></pre>
+
+			<p>Where <code class="language-bash">q</code> is a number between 0 and 100 (0 = biggest compression, worse quality, 100 = smallest compression, best quality).</p>
+
+			<p>To get information about an image:</p>
+
+			<pre><code class="language-matlab">>> imfinfo filename</code></pre>
+
+			<p>would show:</p>
+
+			<pre><code class="language-matlab">>> imfinfo test.jpg
+ans =
+	       Filename: 'test.jpg'
+	    FileModDate: '08-feb-2005 17:18:13'
+	       FileSize: 6125
+	         Format: 'jpg'
+	  FormatVersion: ''
+	          Width: 600
+	         Height: 494
+	       BitDepth: 8
+	      ColorType: 'grayscale'
+	FormatSignature: ''
+	NumberOfSamples: 1
+	   CodingMethod: 'Huffman'
+	  CodingProcess: 'Sequential'
+	        Comment: {}</code></pre>
+
+
+
+
+
+
+				<h2 id="types">Image types</h2>
+
+				<dl>
+					<dt><code class="language-matlab">double</code></dt>
+					<dd>Double precision, numbers in floating point that vary in a range of -10<sup>308</sup> to 10<sup>308</sup> (8 bytes per element)</dd>
+
+					<dt><code class="language-matlab">uint8</code></dt>
+					<dd>8 bit integers in the range of [0,255] (1 byte per element)</dd>
+
+					<dt><code class="language-matlab">uint16</code></dt>
+					<dd>Integers of 16 bits in the range of [0, 65535] (2 bytes per element)</dd>
+
+					<dt><code class="language-matlab">uint32</code></dt>
+					<dd>Integers of 32 bits in the range of [0, 4294967295] (4 bytes per element)</dd>
+
+					<dt><code class="language-matlab">int8</code></dt>
+					<dd>Integers of 8 bits in the range of [-128, 127] (1 byte per element)</dd>
+
+					<dt><code class="language-matlab">int16</code></dt>
+					<dd>Integers of 16 bits in the range of [-32768, 32767] (2 bytes per element)</dd>
+
+					<dt><code class="language-matlab">int32</code></dt>
+					<dd>Integers of 32 bits in the range of [-2147483648,2147483647] (4 bytes per element)</dd>
+
+					<dt><code class="language-matlab">single</code></dt>
+					<dd>Floating point number of simple precision, with values in the range of -10<sup>38</sup> to 10<sup>38</sup> (4 bytes per element)</dd>
+
+					<dt><code class="language-matlab">char</code></dt>
+					<dd>Characters (2 bytes per element)</dd>
+
+					<dt><code class="language-matlab">logical</code></dt>
+					<dd>The values are 0 or 1 (1 byte per element)</dd>
+
+					<dt>Intensity images</dt>
+					<dd>A matrix whose values have been scaled to represent intensity. They could be <code class="language-matlab">uint8</code> or <code class="language-matlab">uint16</code>. If they are <code class="language-matlab">double</code>, the values are scaled in the range [0,1].</dd>
+
+					<dt>Binary images</dt>
+					<dd>Images whose values are only 0 or 1. They are represented in MATLAB using <code class="language-matlab">logical</code> values. To convert an array of zeros and ones into a <code class="language-matlab">logical</code> array in MATLAB, we type:
+
+						<pre><code class="language-matlab">>> B = logical(A)</code></pre>
+
+						To check if an array is <code class="language-matlab">logical</code>:
+
+						<pre><code class="language-matlab">>> isLogical(A)</code></pre>
+					</dd>
+
+				</dl>
+
+
+
+
+
+
+
+
+				<h2 id="conversion">Converting images</h2>
+
+				<table class="table" summary="This table has three columns, presenting the MATLAB conversion command, what does it convert to, and the valid type of entry that the command accepts.">
+					<caption>Image type conversion table</caption>
+					<thead>
+						<tr>
+							<th>Command</th>
+							<th>Converts to</th>
+							<th>Valid entry type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code class="language-matlab">im2uint8</code></td>
+							<td><code class="language-matlab">uint8</code></td>
+							<td><code class="language-matlab">logical</code>, <code class="language-matlab">uint8</code>, <code class="language-matlab">uint16</code> and <code class="language-matlab">double</code></td>
+						</tr>
+						<tr>
+							<td><code class="language-matlab">im2uint16</code></td>
+							<td><code class="language-matlab">uint16</code></td>
+							<td><code class="language-matlab">logical</code>, <code class="language-matlab">uint8</code>, <code class="language-matlab">uint16</code> and <code class="language-matlab">double</code></td>
+						</tr>
+						<tr>
+							<td><code class="language-matlab">mat2gray</code></td>
+							<td><code class="language-matlab">double</code> ([0,1])</td>
+							<td><code class="language-matlab">double</code></td>
+						</tr>
+						<tr>
+							<td><code class="language-matlab">im2double</code></td>
+							<td><code class="language-matlab">double</code></td>
+							<td><code class="language-matlab">logical</code>, <code class="language-matlab">uint8</code>, <code class="language-matlab">uint16</code> and <code class="language-matlab">double</code></td>
+						</tr>
+						<tr>
+							<td><code class="language-matlab">im2double</code></td>
+							<td><code class="language-matlab">logical</code></td>
+							<td><code class="language-matlab">uint8</code>, <code class="language-matlab">uint16</code> and <code class="language-matlab">double</code></td>
+						</tr>
+					</tbody>
+				</table>
+
+				<p>For example:</p>
+
+				<pre><code class="language-matlab">>> f = [0 0.5; 0.75 1.5]
+f =
+	0		0.5000
+	0.7500	1.5000
+
+>> g = im2uint8(f)
+g =
+	  0	128
+	191	255</code></pre>
+
+				<pre><code class="language-matlab">>> g = [0 0.3; 0.7 0.9]
+g =
+	0		0.3000
+	0.7000	0.9000
+
+>> gb = im2bw(g, 0.6)
+gb =
+	0	0
+	1	1</code></pre>
+
+				<p>You can practice these concepts using <code class="language-matlab">snippet01</code>.</p>
+				<div class="menu">
+				    <input type="checkbox" id="show">
+					<label for="show" class="arrow doc">{% include doc.svg %} View snippet 01</label>
+					<div class="arrow selected">
+						Download: &nbsp;
+						<a href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include github.svg %}</a> 
+						<a href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}/">{% include bitbucket.svg %}</a> 
+						<a href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include gitlab.svg %}</a> 
+					</div>
+
+					<pre class="contents"><code class="language-matlab">
+% Load the image
+f = imread('rose.jpg') 
+
+% Show it in a different window
+figure, imshow(f) 
+
+% Show the image inverted
+figure, imshow(f(end:-1:1,end:-1:1)) 
+
+% Show only one of every two pixels (sampled)
+figure, imshow(f(1:2:end,1:2:end)) 
+
+% Show the variation of the intensity for row 512
+v = f(512,1:1:end) 
+plot(v)
+
+% Load a new image
+g = imread('xrays.jpg') 
+figure, imshow(g) 
+ 
+% Expand its dynamic range
+imshow(g,[]) 
+
+% Save as JPEG with a quality factor of 30
+imwrite(g, 'xrays2.jpg', 'quality', 30) 
+h = imread('xrays2.jpg') 
+figure, imshow(h) 
+
+% See detailed information of the previous file
+imfinfo xrays2.jpg 
+
+% Use it as a MATLAB structure
+K = imfinfo( 'xrays.jpg') 
+K.Width
+K.Height
+
+% Compare the compression ratio of the previous image with its original
+k1 = imfinfo('xrays.jpg') 
+k2 = imfinfo('xrays2.jpg') 
+
+ratio = 6261/15800 
+ratio  = 
+
+   0.3963 
+
+% Creating a uint8 representation of an image (i. e., values from 0 to 255)
+matrix = [0.2 0.5; 0.75 1 ] 
+matrix2 = im2uint8(matrix)
+
+matrix2  = 
+
+  51  128 
+ 191  255 
+
+% Creating a double representation of an image (i. e., values from 0 to 1)
+h = uint8([25 50;128 200]) 
+matrix3 = im2double(h) 
+
+matrix3  = 
+
+   0.0980    0.1961 
+   0.5020    0.7843 
+
+% Convert to b/w, where every pixel < 3 is black (0) and > =  3 is white (1)
+f = [1 2;3 4] 
+
+f  = 
+
+    1     2 
+    3     4 
+
+h = im2bw(mat2gray(f), 0.6)
+					</code></pre>
+				</div>
+
+
+			<nav id="toc">
+
+				<h2>Table of contents</h2>
+
+				<ul class="list">
+					<li><a href="#basics">Basics</a></li>
+					<li><a href="#displaying">Displaying images</a></li>
+					<li><a href="#saving">Saving images</a></li>
+					<li><a href="#types">Image types</a></li>
+					<li><a href="#conversion">Converting images</a></li>
+				</ul>
+
+			</nav>
+
+

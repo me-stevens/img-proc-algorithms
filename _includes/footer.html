@@ -1,0 +1,44 @@
+		<footer class="site-footer"><div class="wrapper center">
+
+			<div class="footer-col">
+				<p>Math equations rendering by <a href="https://www.mathjax.org/">MathJax</a>.</p>
+				<hr class="separator">
+				<p>Syntax highlighter:<br> <a href="http://prismjs.com/">prismjs</a>, by Lea Verou</p>
+			</div>
+
+			<div class="footer-col">
+				<ul class="center">{% if site.git_user %}
+
+					<li class="dime-item">
+						<a class="dime-text" href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}">
+							<span class="icon">
+								{% include github.svg %}							</span>
+						</a>
+					</li>
+
+					<li class="dime-item">
+						<a class="dime-text" href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}">
+							<span class="icon">
+								{% include bitbucket.svg %}							</span>
+						</a>
+					</li>
+
+					<li class="dime-item">
+						<a class="dime-text" href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}">
+							<span class="icon">
+								{% include gitlab.svg %}							</span>
+						</a>
+					</li>{% endif %}
+				</ul>
+			</div>
+
+			<div class="footer-col">
+				<p>{{ site.description }}</p>
+				<hr class="separator">
+				<p>This is still a work in progress!</p>
+			</div>
+
+			<p class="center"><a href="{{ site.baseurl }}/">{{ site.url }}</a></p>
+
+
+		</div></footer>

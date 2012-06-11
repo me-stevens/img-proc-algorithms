@@ -1,0 +1,306 @@
+---
+layout: page
+title:  "Segmentation based in borders"
+stitle: "Segmentation based in borders"
+date:   2005-04-27 14:29:34
+mathjax: true
+---
+
+			<h2 id="points">Point detection</h2>
+
+			<p>To detect points in an image we can use a mask like this one:</p>
+
+			<pre><code class="language-matlab">
+-1 -1 -1
+-1  8 -1
+-1 -1 -1</code></pre>
+
+			<p>Using this in MATLAB would be very easy:</p>
+
+			<pre><code class="language-matlab">
+w = [-1 -1 -1; -1 8 -1; -1 -1 -1]
+g = abs(imfilter(double(f), w));
+T = max(g(:)); % &lt;-- T is a limit value.
+g = g >= T;    % &lt;-- g is a logic matrix.
+imshow(g);</code></pre>
+
+			<p>The result would be, black if it didn't detect any point, and white for the pixels where it detected it.</p>
+
+
+			<h2 id="lines">Line detection</h2>
+
+			<p>We can do it through masks:</p>
+
+
+			<pre class="oneOf4"><code class="language-matlab">
+-1 -1 -1
+ 2  2  2
+-1 -1 -1
+% Horizontal</code></pre>
+			<pre class="oneOf4"><code class="language-matlab">
+-1 -1  2
+-1  2 -1
+ 2 -1 -1
+% 45°</code></pre>
+			<pre class="oneOf4"><code class="language-matlab">
+-1 2 -1
+-1 2 -1
+-1 2 -1
+% Vertical</code></pre>
+			<pre class="oneOf4"><code class="language-matlab">
+ 2 -1 -1
+-1  2 -1
+-1 -1  2
+% -45°</code></pre>
+
+			<p>For example, for -45&deg;:</p>
+
+			<pre><code class="language-matlab">
+w = [2 -1 -1; -1 2 -1; -1 -1 2];
+g = imfilter(double(f), w);
+figure, imshow(g, []);
+g = abs(g);
+T = max(g(:));
+g = g >= T;
+figure, imshow(g);</code></pre>
+
+
+			<h2 id="axis">Axis detection</h2>
+
+			<!-- Latex g=\left(G_x^2+G_y^2\right)^{1/2} -->
+			<p class="center"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>g</mi><mo>=</mo><msup><mfenced><mrow><msup><msub><mi>G</mi><mi>x</mi></msub><mn>2</mn></msup><mo>+</mo><msup><msub><mi>G</mi><mi>y</mi></msub><mn>2</mn></msup></mrow></mfenced><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow></msup></math></p>
+
+			<p>The basic idea behind axis detection is to find places in the image where the intensity changes fast, using one of these two criteria:</p>
+
+			<ul class="list">
+				<li>Finding places where the first derivative of the intensity is bigger than a given value.</li>
+				<li>Find places in the image where the second derivative crosses zero.</li>
+			</ul>
+
+			<p>To detect axis:</p>
+
+			<pre><code class="language-matlab">[g, t] = edge(f, 'method', parameters)</code></pre>
+
+
+
+			<h3>Axis detection with Sobel filters</h3>
+
+			<pre><code class="language-matlab">[g, t] = edge(f, 'sobel', T, dir)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the image, <code class="language-matlab">T</code> is the limit (optional), <code class="language-matlab">dir</code> is the direction of filtering (<code class="language-matlab">'horizontal'</code>, <code class="language-matlab">'vertical'</code>, or <code class="language-matlab">'both'</code> (default)), <code class="language-matlab">g</code> is the image of the axis and <code class="language-matlab">t</code> is the limit.</p>
+
+
+			<h3>Axis detection with Prewitt filters</h3>
+
+			<pre><code class="language-matlab">[g, t] = edge(f, 'prewitt', T, dir)</code></pre>
+
+			<h3>Axis detection with Roberts filters</h3>
+
+			<pre><code class="language-matlab">[g, t] = edge(f, 'roberts', T, dir)</code></pre>
+			
+			<h3>Axis detection with LoG filters</h3>
+
+			<pre><code class="language-matlab">[g, t] = edge(f, 'roberts', sigma)</code></pre>
+
+			<p>where <code class="language-matlab">sigma</code> is the standard deviation.</p>
+
+			<h3>Axis detection, the Canny detector</h3>
+
+			<pre><code class="language-matlab">[g, t] = edge(f, 'canny', sigma)</code></pre>
+
+			<p>How it works:</p>
+
+			<ul>
+				<li>We perform a smoothing of the image with a Gaussian filter.</li>
+				<li>The gradients and their direction are calculated for each pixel. An axis point is defined as a point that has a maximum in the direction of the gradient.</li>
+				<li>The algorithm filters the previous image with limits <code class="language-matlab">T1</code> and <code class="language-matlab">T2</code>, where <code class="language-matlab">T1 &lt; T2</code>. Pixels with values bigger than <code class="language-matlab">T2</code> are said to be "strong" axis pixels, pixels in between <code class="language-matlab">T1</code> and <code class="language-matlab">T2</code> are said to be "weak" axis pixels.</li>
+				<li>Finally, the algorithm performs an "edge linking" and incorporates the weak axis pixels that have a connexion of 8 with the group of the strong axis pixels.</li>
+			</ul>
+
+			<img src="{{ site.baseurl}}/img/canny.png" width="1194" height="512" alt="Axis detection in the image of an old house">
+
+
+			<h3>Axis detection, the Hough transform</h3>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/hough1.png" width="1293" height="495" alt="Hough transform"></p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/hough2.png" width="1265" height="492" alt="Hough transform"></p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/hough3.png" width=" 502" height="480" alt="Hough transform"></p>
+
+			<pre><code class="language-matlab">[h, theta, rho] = hough(f, dtheta, drho)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the image, <code class="language-matlab">dtheta</code> and <code class="language-matlab">drho</code> specify the spacing in each axis, <code class="language-matlab">H</code> is the Hough transform, <code class="language-matlab">theta</code> is a vector that contains the angle for each sample and <code class="language-matlab">rho</code> is a vector that contains the &rho; value for each sample.</p>
+
+
+			<p class="center"><img src="{{ site.baseurl}}/img/hough4.png" width="819" height="616" alt="Axis detection in the image of an old house"></p>
+			
+			<pre><code class="language-matlab">[r, c] = houghpeaks(h, numpeaks)</code></pre>
+
+			<p>Here, <code class="language-matlab">h</code> is the Hough transform, <code class="language-matlab">numpeaks</code> is the number of peaks we want to detect, <code class="language-matlab">r</code> is a vector with the position in rows of the peaks and <code class="language-matlab">c</code> is a vector with the position in columns of the peaks.</p>
+
+			<p>With the previous function we detect peaks in the transform that we want to transform into lines. We do that through the function below:</p>
+
+			<pre><code class="language-matlab">lines = houghlines(f, theta, rho, r, c)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the image from which we are going to extract the lines, <code class="language-matlab">theta</code> and <code class="language-matlab">rho</code> are the vectors that we obtain from the Hough transform, and <code class="language-matlab">r</code> and <code class="language-matlab">c</code> are the vectors that <code class="language-matlab">houghpeaks</code> returns.</p>
+
+				<p>You can practice these concepts using <code class="language-matlab">snippet05</code>.</p>
+				<div class="menu">
+				    <input type="checkbox" id="show">
+					<label for="show" class="arrow doc">{% include doc.svg %} View snippet 05</label>
+					<div class="arrow selected">
+						Download: &nbsp;
+						<a href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include github.svg %}</a> 
+						<a href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}/">{% include bitbucket.svg %}</a> 
+						<a href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include gitlab.svg %}</a> 
+					</div>
+
+					<pre class="contents"><code class="language-matlab">
+% Load ('pattern.jpg');
+figure, imshow(f);
+ 
+  
+% Point detection
+w  = [-1 -1 -1; -1 8 -1; -1 -1 -1]
+g1 = abs(imfilter(double(f), w));
+figure, imshow(g1);
+
+T  = max(g1(:))
+g2 = g1 >= T;
+figure, imshow(g2);
+ 
+% Load image
+f = imread('circuitMask.jpg');
+figure, imshow(f);
+ 
+% Line detection
+w  = [2 -1 -1; -1 2 -1; -1 -1 2]
+h1 = imfilter(double(f), w);
+figure, imshow(h1, []);
+
+h1 = abs(h1);
+figure, imshow(h1);
+
+T  = max(h1(:))
+h2 = h1 >= T;
+figure, imshow(h2, []);
+figure, imshow (f);
+ 
+% Load image
+f = imread('house.jpg');
+figure, imshow(f);
+ 
+% Axis calculation with Sobel
+[iv, t] = edge(f, 'sobel', 'vertical');
+figure, imshow(iv);
+
+[ih, t] = edge(f, 'sobel', 'horizontal');
+figure, imshow(ih);
+
+[ivh, t] = edge(f, 'sobel', 'both');
+figure, imshow(ivh);
+ 
+% Axis calculation with LoG
+[j, t] = edge(f, 'roberts', 0.05);
+figure, imshow(j, []);
+
+[j, t] = edge(f, 'roberts', 0.10);
+figure, imshow(j, []);
+
+[j, t] = edge(f, 'roberts', 0.15);
+figure, imshow(j,[]);
+ 
+% Axis calculation with Canny
+T = max(f(:)); 
+k = imhist(f);
+plot(k);
+
+T = [0.15 0.35]
+[l, t] = edge(f, 'canny', T, 0.1);
+ 
+% Axis calculation with Sobel and a limit
+t = 0.05;
+[m, t] = edge(f, 'sobel');
+figure, imshow(m);
+ 
+% LoG with a limit and sigma 
+t = 0.003;
+sigma = 2.25;
+[n, t] = edge(f, 'roberts', sigma);
+figure, imshow(n);
+
+[n, t] = edge(f, 'log', sigma);
+figure, imshow(n, []);
+
+% Canny with a limit and sigma
+T = [0.04 0.10];
+sigma = 1.5;
+[n_canny, t] = edge(f, 'canny', T, sigma);
+figure, imshow(n_canny,[]);
+ 
+% Zero matrix
+z = zeros(101,101);
+z(  1,   1) = 1;
+z(101,   1) = 1; 
+z(  1, 101) = 1; 
+z(101, 101) = 1; 
+z( 51,  51) = 1;
+figure, imshow(z);
+ 
+% Hough transform
+[o1, theta, rho] = hough(z, 0.1, 2);
+figure, imshow(o1);
+
+[o2, theta, rho] = hough(z);
+figure, imshow(o2);
+ 
+% Hough transform - plot
+[p, theta, rho] = hough(z);
+figure, imshow(theta, rho, p, [], 'notruesize');
+axis on;
+axis normal;
+xlabel('\theta')
+ylabel('\rho')
+
+% Hough transform of Canny with limit
+[q, theta, rho] = hough(g_canny, 0.5, 2);
+figure, imshow(theta, rho, q, [], 'notruesize');
+axis on;
+axis normal;
+xlabel('\theta')
+ylabel('\rho')
+ 
+% Hough peaks
+[r, c] = houghpeaks(q,5);
+hold on
+plot(theta(c), rho(r), 'linestyle', 'none', 'marker', 's', 'color', 'w');
+ 
+% Hough lines
+lines = houghlines(g_canny, theta, rho, r, c);
+figure, imshow(g_canny), hold on
+
+for k = 1:length(lines)
+	xy = [lines(k).point1;
+	lines(k).point2];
+	plot(xy(:,2), xy(:,1), 'LineWidth', 4, 'Color', [.6 .6 .6]);
+end					</code></pre>
+				</div>
+
+
+
+
+
+			<nav id="toc">
+
+				<h2>Table of contents</h2>
+
+				<ul class="list">
+					<li><a href="#points">Point detection</a></li>
+					<li><a href="#lines">Lines detection</a></li>
+					<li><a href="#axis">Axis detection</a></li>
+				</ul>
+
+			</nav>
+	
+

@@ -1,0 +1,19 @@
+		<header  class="wrapper">
+
+			<nav role="navigation" class="site-nav">
+
+				<a href="#" class="menu-icon">
+					{% include hamburguer.svg %}				</a>
+
+				<ul class="trigger center">
+					<li><p class="dime-item"><a class="dime-text" href="{{ site.baseurl }}/">Home</a></p></li>{% for topic in site.topics %}
+					<li><p class="dime-item{% if page.dir contains topic[0] %} active{% endif %}"><span class="dime-text">{{ topic[1] }}</span></p>
+						<ul class="submenu">{% for p in site.pages reversed %}{% if p.dir contains topic[0]  %}
+							<li><a href="{{ p.url | prepend: site.baseurl }}">{{ p.stitle }}</a></li>{% endif %}{% endfor %}
+						</ul>
+					</li>{% endfor %}
+				</ul>
+
+			</nav>
+
+		</header>

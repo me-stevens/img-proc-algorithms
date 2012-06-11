@@ -1,0 +1,229 @@
+---
+layout: page
+title:  "Segmentation based in regions"
+stitle: "Segmentation based in regions"
+date:   2005-04-28 14:29:48
+---
+
+			<h2 id="threshold">Threshold</h2>
+
+			<p>MATLAB has an automatic function that searches for a threshold in the histogram. The calculation is based in the optimization of the average intensity in both sides of the threshold. The function has the following syntax:</p>
+
+			<pre><code class="language-matlab">T = graythresh(f)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the original image and <code class="language-matlab">T</code> is the threshold. The threshold is returned in the range of [0,1], so, in order to calculate the threshold image, we need to use:</p>
+
+			<pre><code class="language-matlab">
+T = T *255;
+g = f <= T;</code></pre>
+
+			<p>This converts to black everything that is bigger than the threshold, and the rest to white. If we wanted the opposite, we just change <code class="language-matlab">>=</code> to <code class="language-matlab"><=</code>.</p>
+
+			<h2 id="regiongrow">Region grow</h2>
+
+			<pre><code class="language-matlab">[g, NR, SI, TI] = regiongrow(f, S, T)</code></pre>
+
+			<p>where:</p>
+
+			<ul class="list">
+				<li><code class="language-matlab">f</code> is the image that we want to segment,</li>
+
+				<li><code class="language-matlab">S</code> can be an array or a scalar: if it is an array, it has the same size than the image, and it specifies where are the seeds from which the region is going to grow. If it is a scalar, it defines an intensity value from which, if a pixel in the image has bigger or equal value of intensity, it is turned in to a seed.</li>
+
+				<li><code class="language-matlab">T</code> can also be an array or a scalar and has the same meaning than <code class="language-matlab">S</code>. It indicates if a limit from which a pixel is considered, is associated with a seed or not. Also, for that pixel to be considered part of a region, it needs to have a connectivity of 8, and fulfill the limit condition.</li>
+
+				<li><code class="language-matlab">g</code> is the image with the detected regions,</li>
+
+				<li><code class="language-matlab">NR</code> is the number of regions detected,</li>
+
+				<li><code class="language-matlab">SI</code> is a black and white image, where in white we can see the seed pixels, and</li>
+
+				<li><code class="language-matlab">TI</code> is a black and white image, where in white we can see the pixels that fulfil the limit condition.</li>
+			</ul>
+
+			<p>For example, given this original image:</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/regiongrow1.png" width="1053" height="549" alt="Region grow example 1"></p>
+
+			<p><strong>First step:</strong> Select the seed points:</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/regiongrow2.png" width="1053" height="549" alt="Region grow example 2"></p>
+
+			<p><strong>Second step:</strong> Select the points that fulfill the limit condition set by <code class="language-matlab">T</code>:</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/regiongrow3.png" width="1053" height="549" alt="Region grow example 3"></p>
+
+			<p><strong>Third step:</strong> Pick the points that have connection 8 with respect to the seed points:</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/regiongrow4.png" width="1053" height="549" alt="Region grow example 4"></p>
+
+
+
+			<h2 id="splitmerge">Split and merge</h2>
+
+			<pre><code class="language-matlab">g = splitmerge(f, mindim, fun)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the original image, <code class="language-matlab">mindim</code> is an integer number, power of 2, which specifies the minimum size of a region, and <code class="language-matlab">fun</code> is a function that must be passed to MATLAB, with the following syntax:</p>
+
+			<pre><code class="language-matlab">flag = predicate(region)</code></pre>
+
+			<p>where <code class="language-matlab">region</code> is the region for which we want to check that it fulfills a certain condition, and <code class="language-matlab">flag</code> is true or false.</p>
+
+			<p>This is how it works. First, we divide the image in four regions:</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/splitmerge1.png" width="1263" height="410" alt="Split-merge example 1"></p>
+
+			<p>Then, we check if the four regions fulfill the <code class="language-matlab">fun</code> condition. If there is a region that results in "false", we divide it in four regions again:</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/splitmerge2.png" width="1278" height="390" alt="Split-merge example 2"></p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/splitmerge3.png" width="1278" height="390" alt="Split-merge example 3"></p>
+
+
+
+			<h2 id="crestvalley">Crests and valleys</h2>
+
+			<pre><code class="language-matlab">L = watershed(D)</code></pre>
+
+			<p>This function returns a matrix of the same size than the image we are processing. It marks the points where there are crests.</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/watershed1.png" width="1099" height="345" alt="Watershed example 1"></p>
+
+			<p>To calculate the "watershed image", we can use this MATLAB function:</p>
+
+			<pre><code class="language-matlab">D = bwdist(f)</code></pre>
+
+			<p>which calculates the distance of every pixel of the image <code class="language-matlab">f</code> to the nearest white pixel.</p>
+
+			<p class="center"><img src="{{ site.baseurl}}/img/watershed2.png" width="830" height="232" alt="Watershed example 2"></p>
+
+			<p>You can practice these concepts using <code class="language-matlab">snippet06</code>.</p>
+				<div class="menu">
+				    <input type="checkbox" id="show">
+					<label for="show" class="arrow doc">{% include doc.svg %} View snippet 06</label>
+					<div class="arrow selected">
+						Download: &nbsp;
+						<a href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include github.svg %}</a> 
+						<a href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}/">{% include bitbucket.svg %}</a> 
+						<a href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include gitlab.svg %}</a> 
+					</div>
+
+					<pre class="contents"><code class="language-matlab">
+% Load image
+f = imread('text.jpg');
+
+% Threshold
+T = graythresh(f);
+T = T *255;
+g1 = f &lt;= T;
+imshow(g1);
+
+g2 = f >= T;
+figure, imshow(g2);
+
+% Load image
+f = imread('xray1.jpg');
+
+% Histograma
+h = imhist(f);
+figure, plot(h);
+
+% Region grow
+[i, NR, SI, TI] = regiongrow(f, 255, 65);
+figure, imshow(g);
+NR = 10
+figure, imshow(SI);
+figure, imshow(TI);
+
+% Load image
+f = imread('xray2.jpg');
+
+% Split & Merge
+j1 = splitmerge(f, 32, 'predicate');
+figure, imshow(j1);
+
+j2 = splitmerge(f, 16, 'predicate');
+figure, imshow(j2);
+
+j3 = splitmerge(f,  8, 'predicate');
+figure, imshow(j3);
+
+j4 = splitmerge(f,  4, 'predicate');
+figure, imshow(j4);
+
+j5 = splitmerge(f,  2, 'predicate');
+figure, imshow(j5);
+
+% Load image
+f = imread('circles.jpg');
+
+% B&W conversion
+k = im2bw(f, graythresh(f));
+figure, imshow(f);
+figure, imshow(k);
+
+% Distance calculation
+kc = ~k;
+figure, imshow(kc);
+
+kd = bwdist(kc);
+figure, imshow(kd,[]);
+
+% Watershed
+kl = watershed(kd);
+figure, imshow(kl);
+figure, imshow(kl, []);
+
+klog = k & kl;   
+figure, imshow(klog);
+
+% Load image
+f = imread('image.jpg');
+
+% Filtering
+mh = fspecial('sobel')
+mh =
+     1     2     1
+     0     0     0
+    -1    -2    -1
+
+fd = double(f);
+m  = sqrt(imfilter(fd, mh, 'replicate').^2 + imfilter(fd, mh','replicate').^2);
+figure, imshow(imfilter(fd, mh, 'replicate'));
+figure, imshow(imfilter(fd, mh','replicate'));
+figure, imshow(m);
+
+ml = watershed(m);
+figure, imshow(ml);
+
+wr = ml == 0;
+mn = f;
+mn(wr) = 255;
+figure, imshow(mn);</code></pre>
+
+					<pre class="contents"><code class="language-matlab">
+% predicate.m
+function flag = predicate(region)
+sd   = std2(region);
+m    = mean2(region);
+flag = (sd > 10) & (m > 0) & (m &lt; 125);
+					</code></pre>
+				</div>
+	
+
+
+
+			<nav id="toc">
+
+				<h2>Table of contents</h2>
+
+				<ul class="list">
+					<li><a href="#threshold">Threshold</a></li>
+					<li><a href="#regiongrow">Region grow</a></li>
+					<li><a href="#splitmerge">Split and merge</a></li>
+					<li><a href="#crestvalley">Crests and valleys</a></li>
+				</ul>
+
+			</nav>
+	
+

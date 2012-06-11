@@ -1,0 +1,291 @@
+---
+layout: page
+title:  "Introduction"
+stitle: "Introduction"
+date:   2005-03-17 22:09:14
+---
+
+			<h2 id="environment">Environment</h2>
+
+			<p>This snippet's purpose is to get familiarized with basic MATLAB's interface and tools, specially working with vectors and matrices.</p>
+
+			<img src="{{ site.baseurl}}/img/environ.png" width="" height="" alt="Snapshot of MATLAB interface">
+			<p>The command window is where you type your commands.</p>
+
+
+
+			<h2 id="commands">Daily commands</h2>
+
+			<p>If you ever used a Linux terminal, many commands are basically the same, for example:</p>
+			<ul class="list">
+				<li><code class="language-bash">ls</code> or <code class="language-bash">dir</code> list files under this directory.</li>
+				<li><code class="language-bash">cd</code> change directory.</li>
+				<li><code class="language-bash">pwd</code> return working directory (where you are at the moment).</li>
+				<li><code class="language-bash">rmdir</code> delete empty directory. Use <code class="language-bash">s</code> to delete non-empty directories. For example: <code class="language-bash">rmdir mydir s</code>.</li>
+				<li><code class="language-bash">delete</code> delete file.</li>
+				<li><code class="language-bash">help + command</code> obtain help about that command.</li>
+			</ul>
+
+
+
+			<h2 id="matrices">Vectors and matrices</h2>
+
+			<p>The name of MATLAB comes from "Matrix Laboratory". That's because everything is a matrix in MATLAB, even numbers (1x1 matrix) and vectors (1xN matrix for row vectors and Nx1 for column vectors):</p>
+			<pre><code class="language-matlab">>> v = [1 2 3 4]</code></pre>
+
+			<p>To convert it to a column vector:</p>
+			<pre><code class="language-matlab">>> w = v.'
+w =
+	1
+	2
+	3
+	4</code></pre>
+
+			<p>Accesing an element:</p>
+			<pre><code class="language-matlab">>> v(2)
+ans = 
+	2</code></pre>
+
+			<p>The variable <code class="language-matlab">ans</code> is an auxiliary used by MATLAB when you don't make any assignement to your own variables. To return a range:</p>
+			<pre><code class="language-matlab">>> v(2:3)
+ans = 
+	2	3
+
+>> v(2:end)
+ans = 
+	2	3	4</code></pre>
+
+			<p>You can make jumps:</p>
+			<pre><code class="language-matlab">v =
+1	2	3	4	5	7	8	9	10
+
+>> v(1:2:end)
+ans =
+	1	3	5	7	9</code></pre>
+
+			<p>You can use another vector as index of a vector</p>
+			<pre><code class="language-matlab">>> v( [1 4 7] )
+ans = 
+	1	4	7</code></pre>
+
+			<p>To define a 3x3 matrix:</p>
+			<pre><code class="language-matlab">>> A = [1 2 3; 4 5 6; 7 8 9]
+A =
+	1	2	3
+	4	5	6
+	7	8	9</code></pre>
+
+			<p>To select an element:</p>
+			<pre><code class="language-matlab">>> A(2,3)
+ans =
+	6</code></pre>
+
+			<p>To select a column vector:</p>
+			<pre><code class="language-matlab">>> A(1:2,3)
+ans =
+	3
+	6</code></pre>
+
+			<p>To select a row vector:</p>
+			<pre><code class="language-matlab">>> A(2,:)
+ans =
+	4	5	6</code></pre>
+
+			<p>To select a submatrix:</p>
+			<pre><code class="language-matlab">>> A(1:2,:)
+ans =
+	1	2	3
+	4	5	6</code></pre>
+
+			<p>To make all elements in the third column equal to zero:</p>
+			<pre><code class="language-matlab">>> B = A;
+B(:,3) = 0
+B =
+	1	2	0
+	4	5	0
+	7	8	0</code></pre>
+
+			<p>To jump columns:</p>
+			<pre><code class="language-matlab">>> A(1:end,1:2:end) = 0
+B =
+	1	2	0
+	4	5	0
+	7	8	0</code></pre>
+
+			<p>A logical matrix is made of 1s and 0s, where 1 represents "true" and 0 represents "false":</p>
+			<pre><code class="language-matlab">>> D = logical([1 0 0; 0 0 1; 0 0 0])
+D =
+	1	0	0
+	0	0	1
+	0	0	0
+
+>> A(D)
+ans =
+	1
+	6</code></pre>
+
+			<p>To have all matrix elements in a column vector:</p>
+			<pre><code class="language-matlab">>> A(:)
+ans =
+	1
+	4
+	7
+	2
+	5
+	8
+	3
+	6
+	9</code></pre>
+
+			<p>To know the dimensions of a matrix:</p>
+			<pre><code class="language-matlab">>> A = [1 1 1; 1 2 3]
+A =
+	1	1	1
+	1	2	3
+
+>> [M, N] = size(A)
+M =
+	2
+N =
+	3</code></pre>
+
+			<h2 id="standard">Standard arrays</h2>
+
+			<ul class="list">
+				<li><code class="language-matlab">zeros(M,N)</code> MxN matrix of zeros of double type.</li>
+				<li><code class="language-matlab">ones(M,N)</code> MxN matrix of ones of type double.</li>
+				<li><code class="language-matlab">true(M,N)</code> MxN logical matrix of all ones.</li>
+				<li><code class="language-matlab">false(M,N)</code> MxN logical matrix of all zeros.</li>
+				<li><code class="language-matlab">magic(M)</code> MxM <a href="https://en.wikipedia.org/wiki/Magic_square"><strong>magic-square</strong></a> matrix.</li>
+				<li><code class="language-matlab">rand(M,N)</code> MxN of random numbers in the interval [0,1].</li>
+				<li><code class="language-matlab">randn(M,N)</code> same as previous but <a href="https://en.wikipedia.org/wiki/Normal_distribution"><strong>normally distributed</strong></a> (gaussian, for example).</li>
+			</ul>
+
+
+			<h2 id="mfiles">Writing .m files</h2>
+
+			<p>An .m file is MATLAB's batch file, i.e. a text file where you can write your commands and then load it in your workspace and run it to execute those commands. To write those files you can use MATLAB's editor. To call the editor, type <code class="language-matlab">editor</code> in the command window. To run an .m file, go to the directory where the file is and type its name.</p>
+
+			<p>Example of .m file:</p>
+			<pre><code class="language-matlab">% Read an image in this directory
+f = imread('audi.jpg');
+
+% Save the image's size
+% M is the number of rows
+% N is the number of columns
+% c is the number of colors
+[M, N, c] = size(f);
+
+% Detailed info (don't use ; or it won't print anything)
+whos f</code></pre>
+
+			<p>Any line that starts with a <code class="language-matlab">%</code> is a comment and is ignored. If you end a line with <code class="language-matlab">;</code>, it will be executed but nothing will be printed to the console.</p>
+
+			<h2 id="control">Control structures</h2>
+
+			<h3>The for loop</h3>
+
+			<p>The syntax of a for loop in MATLAB is:</p>
+			<pre><code class="language-matlab">for index = start : increment: finish
+	&lt;what you want to execute n times>
+end</code></pre>
+
+			<p>For example:</p>
+			<pre><code class="language-matlab">% Example of for loop
+A = [1 1 1; 1 1 1; 1 1 1]
+for q = 0:1:3
+	A = A*A
+end</code></pre>
+
+			<h3>The if - elseif - else statement</h3>
+
+			<p>The syntax of conditional statements in MATLAB is:</p>
+			<pre><code class="language-matlab">if expression 1
+	statement 1
+elseif expression 2
+	statement 2
+else
+	statement 3
+end</code></pre>
+
+			<p>An example using the function <code class="language-matlab">disp()</code> to write things to the console:</p>
+			<pre><code class="language-matlab">% Example of conditional sentences
+for q = 0:1:4
+	if q == 0
+		disp('q = 0')
+	elseif q == 1
+		disp('q = 1')
+	elseif q == 2
+		disp('q = 2')
+	else
+		disp('q is not 0, 1 or 2')
+end</code></pre>
+
+			<h3>The while loop</h3>
+
+			<p>The syntax of a while loop in MATLAB is:</p>
+			<pre><code class="language-matlab">while expression
+	sentences
+end</code></pre>
+
+			<p>For example:</p>
+			<pre><code class="language-matlab">% Example of while loop
+a = 10;
+b = 5;
+
+while a
+	a = a - 1;
+	disp('loop a')
+	while b
+		b = b - 1;
+		disp('loop b')
+	end
+end</code></pre>
+
+
+			<h3>The switch conditional</h3>
+
+			<p>The syntax of the switch conditional in MATLAB is:</p>
+			<pre><code class="language-matlab">switch expression
+	case case1
+		sentences
+	case case2
+		sentences
+	...
+	otherwise
+		sentences
+end</code></pre>
+
+			<p>You can place as many cases as you need. The moment a case matches the expression, MATLAB will leave the switch. For example:</p>
+			<pre><code class="language-matlab">% Example of the switch conditional
+for q = 0:1:4
+	switch q
+		case 0
+			disp('q = 0')
+		case 1
+			disp('q = 1')
+		case 2
+			disp('q = 2')
+		case 3
+			disp('q = 3')
+		otherwise
+			disp('q is not 0, 1, 2 or 3')
+	end
+end</code></pre>
+
+			<nav id="toc">
+
+				<h2>Table of contents</h2>
+
+				<ul class="list">
+					<li><a href="#environment">Environment</a></li>
+					<li><a href="#commands">Daily commands</a></li>
+					<li><a href="#matrices">Vectors and matrices</a></li>
+					<li><a href="#standard">Standard arrays</a></li>
+					<li><a href="#mfiles">Writing .m files</a></li>
+					<li><a href="#control">Control structures</a></li>
+				</ul>
+
+			</nav>
+	
+

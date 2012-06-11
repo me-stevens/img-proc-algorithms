@@ -1,0 +1,234 @@
+---
+layout:  page
+title:   "Histograms and contrast"
+stitle:  "Histos & contrast"
+date:    2005-04-07 15:27:08
+---
+
+			<p>In this section, we are going to learn how to manipulate the contrast and histogram of images in MATLAB.</p>
+
+			<h2 id="intensity">Intensity transformations</h2>
+
+			<p>These transformations act over a unique pixel of the image, modifying its intensity value:</p>
+
+			<pre><code class="language-matlab">g = imadjust(f, [low_in high_in], [low_out high_out], gamma)</code></pre>
+
+			<p>The intensity of the pixels is changed according to the plots below, which depend on the value of <code class="language-matlab">gamma</code>. If <code class="language-matlab">gamma</code> is ommited, it takes a default value of <code class="language-matlab">1</code>. If <code class="language-matlab">high_out</code> is lower than <code class="language-matlab">low_out</code>, the exit intensity will be inverted with respect to the original image.</p>
+
+			<p class="center"><img src="{{ site.baseurl }}/img/histoplots.png" width="1137" height="265" alt="Intensity transformations plots"></p>
+
+			<p>For example, this:</p>	
+
+			<pre><code class="language-matlab">g = imadjust(f, [0.5 0.75], [0 1])</code></pre>
+
+			<p>produces:</p>	
+
+			<p class="center"><img src="{{ site.baseurl }}/img/imadjust.png" width="1677" height="873" alt="Image adjustment example"></p>
+
+			<h2 id="logaritmic">Logaritmic transformations</h2>
+
+			<p>It is also possible to make a <strong>logaritmic transformation</strong>:</p>
+
+			<pre><code class="language-matlab">g = c * log(1 + double(f))</code></pre>
+
+			<p>where <code class="language-matlab">c</code> is an arbitrary constant. This transformation compresses the dynamic range of an image, and its shape is similar to the gamma curve.</p>
+
+			<p>Since the result is going to be in a wide range, it is convenient to reduce it in the following way:</p>
+
+			<pre><code class="language-matlab">gs = im2uint8(mat2gray(g))</code></pre>
+
+			<p>The command <code class="language-matlab">mat2gray()</code> reduces the scale to values between [0, 1], and the command <code class="language-matlab">im2uint8()</code> adapts them to a representation of [0, 255].</p>
+
+			<p class="center"><img src="{{ site.baseurl }}/img/logarithm.png" width="1539" height="867" alt="Logarithmic transformation example"></p>
+
+			<h2 id="contrast">Contrast-Stretching</h2>
+
+			<p>Finally, the technique of <strong>Contrast-Stretching</strong> compresses the intensity values lower than <code class="language-matlab">m</code> into darker values, and values larger than <code class="language-matlab">m</code> into lighter values.</p>
+
+			<p class="center"><img src="{{ site.baseurl }}/img/contrast-stretching1.png" width="1509" height="648" alt="Constrast-Stretching plots"></p>
+
+			<pre><code class="language-matlab">g = 1./(1 + (m./ (double(f) + eps) ).^E)</code></pre>
+
+			<p><code class="language-matlab">E</code> controls the slope of the function and <code class="language-matlab">m</code> is the mid-line where you want to switch from dark values to light values, <code class="language-matlab">eps</code> is a MATLAB constant that represents the distance between 1.0 and the next largest number that can be represented in double-precision floating point. In this equation it is used to prevent division by zero in the event that the image has any zero valued pixels.</p>
+
+			<p class="center"><img src="{{ site.baseurl }}/img/contrast-stretching2.png" width="1104" height="927" alt="Rx image of a human body and its resulting constrast-stretching image"></p>
+
+
+
+
+			<h2 id="processing">Histogram processing</h2>
+
+			<p>To create the histogram of an image in MATLAB:</p>
+
+			<pre><code class="language-matlab">h = imhist(f,b)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the image and <code class="language-matlab">b</code> is the number of bins used to form the histogram. If <code class="language-matlab">b</code> is not specified, 256 is used by default.</p>
+
+			<p class="center"><img src="{{ site.baseurl }}/img/histogram-processing.png" width="1517" height="694" alt="Image of a rose and its resulting histogram"></p>
+
+
+
+
+			<h2 id="equalizing">Histogram equalizing</h2>
+
+			<p>To equalize a histogram:</p>
+
+			<pre><code class="language-matlab">h = histeq(f,nlev)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the image and <code class="language-matlab">nlev</code> is the number of bins for the output image. If <code class="language-matlab">nlev</code> is lower than the original number of levels of gray, <code class="language-matlab">histeq</code> will try to distribute the levels so that you end up with a flat histogram. By default we choose 256.</p>
+
+			<p class="center"><img src="{{ site.baseurl }}/img/histogram-equalizing1.png" width="1215" height="597" alt="Image of a group of pollen cells and its resulting histogram"></p>
+			<p class="center"><img src="{{ site.baseurl }}/img/histogram-equalizing2.png" width="1215" height="597" alt="The previous image, equalized, and its resulting equalized histogram"></p>
+
+
+
+
+			<h2 id="local">Local adaptations</h2>
+
+			<p>To make a local adaptation of the histogram of an image:</p>
+
+			<pre><code class="language-matlab">g = histeq(f,hspec)</code></pre>
+
+			<p>where <code class="language-matlab">f</code> is the image and <code class="language-matlab">hspec</code> is the histogram to which we want to adapt the histogram of our image.</p>
+
+			<p class="center"><img src="{{ site.baseurl }}/img/histogram-local-adaptation.png" width="1224" height="600" alt="Image of a satellite before and after applying the local adaptation to its darker side to make it brighter"></p>
+
+				<p>You can practice these concepts using <code class="language-matlab">snippet02</code>.</p>
+				<div class="menu">
+				    <input type="checkbox" id="show">
+					<label for="show" class="arrow doc">{% include doc.svg %} View snippet 02</label>
+					<div class="arrow selected">
+						Download: &nbsp;
+						<a href="https://github.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include github.svg %}</a> 
+						<a href="https://bitbucket.org/{{ site.git_user }}/{{ site.git_repo }}/">{% include bitbucket.svg %}</a> 
+						<a href="https://gitlab.com/{{ site.git_user }}/{{ site.git_repo }}/">{% include gitlab.svg %}</a> 
+					</div>
+
+					<pre class="contents"><code class="language-matlab">
+% Load the image
+f = imread('mammography.jpg');
+imshow(f)
+
+g1 = imadjust(f, [0 1], [1 0]);
+imshow(g1)
+
+% Dynamic range
+g2 = imadjust(f, [0.5 0.75], [0 1]);
+figure, imshow(g2);
+
+g3 = imadjust(f, [0 1], [0 1], 2);
+figure, imshow(g3);
+
+% Load next image
+f = imread('fourier.jpg');
+imshow(f)
+
+% Logaritmic transformation
+g = 1 * log(1 + double(f));
+imshow(g)
+
+gs = im2uint8(mat2gray(g));
+figure, imshow(g)
+figure, imshow(gs)
+figure, imshow(f)
+
+% Load next image
+f = imread('bones.jpg');
+imshow(f)
+
+% Mean and contrast-streching
+m = mean2(f)
+
+m =
+
+   17.1349
+
+g4 = 1 ./ (1 + (m ./ (double(f) + eps)).^0.7);
+g5 = 1 ./ (1 + (m ./ (double(f) + eps)).^1.5); 
+imshow(g4);
+imshow(g5);
+
+% Yet another image
+f = imread('rose.jpg');
+imshow(f)
+
+% Histogram
+h = imhist(f);
+plot(h)
+
+axis([0 260 0 7.5]);
+plot(h)
+
+set(gca, 'xtick', 0:50:250);
+xlabel('Pixel value', 'fontsize', 10);
+ylabel('Frecuencies', 'fontsize', 10);
+title('Histogram of rose.jpg');
+
+% Load pollen image
+f = imread('pollen.jpg');
+imshow(f)
+
+% Equalization
+h = imhist(f);
+plot(h)
+figure, imshow(f)
+
+g = histeq(f,500);
+figure, plot(g)
+figure, imshow(g)
+
+% Load moon image
+f = imread('moon.jpg');
+imshow (f)
+
+% Equalization
+h = histeq(f,256);
+figure, imshow(h)
+
+g = imhist(f);
+plot (g)
+
+g2 = imhist(h);
+figure, plot(g2);
+
+% Local adaptation of the histogram with a gaussian
+C1 = 1.5  * (1 / ((2*pi)^0.5)*0.05);
+C2 = 0.15 * (1 / ((2*pi)^0.5)*0.05);
+
+k1 = 2 * (0.05 ^2);
+k2 = 2 * (0.05 ^2);
+
+z = linspace(0,1,256);
+p = 1 + C1 * exp(-((z-0.1).^2) ./ k1) + C2 * exp(-((z-0.65).^2)./k2);
+figure, plot(p);
+
+C1 = 0.8  * (1 / ((2*pi)^0.5)*0.05);
+C2 = 0.09 * (1 / ((2*pi)^0.5)*0.05);
+
+k1 = 2 * (0.05 ^2);
+k2 = 2 * (0.05 ^2);
+
+z = linspace(0,1,256);
+p = 0.00198 + C1 * exp(-((z-0.15).^2) ./ k1) + C2 * exp(-((z-0.72).^2)./k2);
+figure, plot(p);
+
+axis([0 300 0 0.02]);
+figure, plot(p);
+					</code></pre>
+				</div>
+
+
+			<nav id="toc">
+
+				<h2>Table of contents</h2>
+
+				<ul class="list">
+					<li><a href="#intensity">Intensity transformations</a></li>
+					<li><a href="#logaritmic">Logaritmic transformations</a></li>
+					<li><a href="#contrast">Contrast-Stretching</a></li>
+					<li><a href="#processing">Histogram processing</a></li>
+					<li><a href="#equalizing">Histogram equalizing</a></li>
+					<li><a href="#local">Local adaptations</a></li>
+				</ul>
+
+			</nav>
